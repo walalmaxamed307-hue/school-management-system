@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+/* Class-based dark mode — .dark class ku dhex jira <html>, ma aha
+   prefers-color-scheme automatic (adiga ayaa toggle-ka maamula). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --color-primary-50: #e1f5ee;
+  --color-primary-100: #b8e6d5;
+  --color-primary-500: #0f6e56;
+  --color-primary-600: #0a5a45;
+
+  /* brand: fixed, ma is-beddesho dark/light — waa astaanta iskuulka (logo,
+     login branding panel), ma aha midab interactive ah sida buttons. */
+  --color-brand: #0f6e56;
+  --color-brand-dark: #08402f;
+
+  --color-surface: #fefefc;
+  --color-canvas: #f7f6f2;
+  --color-border: #e5e3dc;
+
+  --color-ink: #1c1c1a;
+  --color-ink-muted: #6b6963;
+
+  --color-danger-50: #fcebeb;
+  --color-danger-500: #b3261e;
+
+  --color-warning-50: #faeeda;
+  --color-warning-500: #b45309;
+}
+
+body {
+  margin: 0;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Dark palette — kaliya CSS vars-ka ayaan bedelnay, component-yada wax kama
+   beddelmin (waxay horeba isticmaaleen bg-canvas/text-ink/iwm). */
+.dark {
+  color-scheme: dark;
+  --color-surface: #1c1c1a;
+  --color-canvas: #131311;
+  --color-border: #2e2e2b;
+  --color-ink: #f5f4f0;
+  --color-ink-muted: #9c9a92;
+  --color-primary-50: #113d31;
+  --color-primary-100: #145a45;
+  --color-primary-600: #34d399;
+  --color-danger-50: #3a1615;
+  --color-danger-500: #f87171;
+  --color-warning-50: #3a2a0f;
+  --color-warning-500: #fbbf24;
+}
+
+/* Print: kaliya waxa leh class="print-area" ayaa daabacaadda ku muuqan
+   doona — sidebar/header/buttons oo dhan way qarsoomayaan. */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .print-area,
+  .print-area * {
+    visibility: visible;
+  }
+  .print-area {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
