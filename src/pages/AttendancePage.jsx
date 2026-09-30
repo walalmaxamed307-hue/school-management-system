@@ -113,7 +113,7 @@ function AttendancePage() {
               disabled={isTeacher && !!user.section}
               className="flex-1 rounded-lg border border-border bg-surface px-3 py-2 text-sm text-ink outline-none focus:border-primary-500 disabled:opacity-60 sm:flex-none"
             >
-              <option value="">-- Dooro section --</option>
+              <option value="">-- Dooro Section --</option>
               {selectedClassObj.sections.map((s) => (
                 <option key={s} value={s}>
                   Section {s}
