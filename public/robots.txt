@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+Disallow: /login
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /platform
+Disallow: /api
+
+Sitemap: https://iskuulcaawiye.com/sitemap.xml
