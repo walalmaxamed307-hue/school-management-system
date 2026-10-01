@@ -1,7 +1,7 @@
 import { MessageCircle } from 'lucide-react'
 
 // TODO: beddel lambarkan mid dhab ah (WhatsApp support number-kaaga).
-const WHATSAPP_NUMBER = '252610000000'
+const WHATSAPP_NUMBER = '252629707713'
 
 function WhatsAppButton() {
   return (
