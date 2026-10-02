@@ -22,7 +22,7 @@ function StaffLoginForm() {
     setAuthError('')
     const result = await login(values.email, values.password)
     if (result.success) {
-      navigate('/')
+      navigate('/dashboard')
       return
     }
     setAuthError(result.error)

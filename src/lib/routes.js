@@ -4,5 +4,5 @@
 // abuuri lahaa haddii kale).
 export function getHomeRoute(role) {
   if (role === 'student') return '/my-results'
-  return '/'
+  return '/dashboard'
 }

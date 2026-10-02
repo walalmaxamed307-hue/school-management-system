@@ -20,6 +20,7 @@ import CatchAllRedirect from '@/components/CatchAllRedirect'
 import DashboardLayout from '@/layouts/DashboardLayout'
 import StudentLayout from '@/layouts/StudentLayout'
 import LoginPage from '@/pages/LoginPage'
+import LandingPage from '@/pages/LandingPage'
 import DashboardPage from '@/pages/DashboardPage'
 import StudentsPage from '@/pages/StudentsPage'
 import TeachersPage from '@/pages/TeachersPage'
@@ -72,56 +73,62 @@ function AppProviders({ children }) {
 // ku hadhay xusuusta browser-ka ee iskuul A.
 function Shell() {
   const { user } = useAuth()
+
   return (
-    <AppProviders key={user?.id ?? 'anon'}>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/login" element={<LoginPage />} />
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<LoginPage />} />
 
-            <Route
-              element={
-                <ProtectedRoute allowedRoles={['admin', 'teacher']}>
-                  <DashboardLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route path="/" element={<DashboardPage />} />
-              <Route path="/attendance" element={<AttendancePage />} />
-              <Route path="/exam-results" element={<ExamResultsPage />} />
-              <Route path="/announcements" element={<AnnouncementsPage />} />
-              <Route path="/rooms" element={<RoomsPage />} />
-              <Route path="/graduates" element={<GraduatesPage />} />
-            </Route>
+        <Route
+          element={
+            <ProtectedRoute allowedRoles={['admin', 'teacher']}>
+              <AppProviders key={user?.id ?? 'anon'}>
+                <DashboardLayout />
+              </AppProviders>
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/attendance" element={<AttendancePage />} />
+          <Route path="/exam-results" element={<ExamResultsPage />} />
+          <Route path="/announcements" element={<AnnouncementsPage />} />
+          <Route path="/rooms" element={<RoomsPage />} />
+          <Route path="/graduates" element={<GraduatesPage />} />
+        </Route>
 
-            <Route
-              element={
-                <ProtectedRoute allowedRoles={['admin']}>
-                  <DashboardLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route path="/students" element={<StudentsPage />} />
-              <Route path="/teachers" element={<TeachersPage />} />
-              <Route path="/fees" element={<FeesPage />} />
-              <Route path="/settings" element={<SettingsPage />} />
-            </Route>
+        <Route
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AppProviders key={user?.id ?? 'anon'}>
+                <DashboardLayout />
+              </AppProviders>
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/students" element={<StudentsPage />} />
+          <Route path="/teachers" element={<TeachersPage />} />
+          <Route path="/fees" element={<FeesPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+        </Route>
 
-            <Route
-              element={
-                <ProtectedRoute allowedRoles={['student']}>
-                  <StudentLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route path="/my-results" element={<StudentResultsPage />} />
-              <Route path="/my-announcements" element={<AnnouncementsPage />} />
-              <Route path="/my-room" element={<StudentRoomPage />} />
-            </Route>
+        <Route
+          element={
+            <ProtectedRoute allowedRoles={['student']}>
+              <AppProviders key={user?.id ?? 'anon'}>
+                <StudentLayout />
+              </AppProviders>
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/my-results" element={<StudentResultsPage />} />
+          <Route path="/my-announcements" element={<AnnouncementsPage />} />
+          <Route path="/my-room" element={<StudentRoomPage />} />
+        </Route>
 
-            <Route path="*" element={<CatchAllRedirect />} />
-          </Routes>
-        </BrowserRouter>
-    </AppProviders>
+        <Route path="*" element={<CatchAllRedirect />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 

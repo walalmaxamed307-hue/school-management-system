@@ -1,10 +1,18 @@
 User-agent: *
 Allow: /
-
 Disallow: /login
-Disallow: /admin
 Disallow: /dashboard
-Disallow: /platform
-Disallow: /api
+Disallow: /students
+Disallow: /teachers
+Disallow: /attendance
+Disallow: /fees
+Disallow: /exam-results
+Disallow: /announcements
+Disallow: /rooms
+Disallow: /graduates
+Disallow: /settings
+Disallow: /my-results
+Disallow: /my-announcements
+Disallow: /my-room
 
 Sitemap: https://iskuulcaawiye.com/sitemap.xml
