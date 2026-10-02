@@ -9,7 +9,7 @@ function SchoolLogo({ compact = false }) {
   return (
     <div className="flex min-w-0 items-center gap-2.5">
       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand text-white">
-        <GraduationCap size={18} />
+       
       </div>
       {!compact && (
         <p className="truncate text-base font-medium tracking-tight text-ink">
