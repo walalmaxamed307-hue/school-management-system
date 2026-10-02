@@ -1,5 +1,5 @@
 import { Outlet, useNavigate, NavLink } from 'react-router-dom'
-import { LogOut, FileText, Megaphone, DoorOpen } from 'lucide-react'
+import { LogOut, FileText, Megaphone, DoorOpen, BookOpen } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import ThemeToggle from '@/components/ThemeToggle'
 import SchoolLogo from '@/components/SchoolLogo'
@@ -35,6 +35,9 @@ function StudentLayout() {
       <nav className="no-print flex shrink-0 gap-4 overflow-x-auto border-b border-border bg-surface px-4 sm:px-6">
         <NavLink to="/my-results" className={tabClass}>
           <FileText size={16} /> <span className="whitespace-nowrap">Natiijadayda</span>
+        </NavLink>
+        <NavLink to="/my-homework" className={tabClass}>
+          <BookOpen size={16} /> <span className="whitespace-nowrap">Assignments</span>
         </NavLink>
         <NavLink to="/my-announcements" className={tabClass}>
           <Megaphone size={16} /> <span className="whitespace-nowrap">Announcements</span>

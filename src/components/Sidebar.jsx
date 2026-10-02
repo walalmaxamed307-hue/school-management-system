@@ -11,17 +11,19 @@ import {
   Megaphone,
   DoorOpen,
   Award,
+  BookOpen,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
-import brandMark from '@/assets/brand-mark.png'
 import SchoolLogo from '@/components/SchoolLogo'
+
 const navItems = [
-  { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+  { label: 'Dashboard', path: '/', icon: LayoutDashboard },
   { label: 'Students', path: '/students', icon: Users, adminOnly: true },
   { label: 'Teachers', path: '/teachers', icon: GraduationCap, adminOnly: true },
   { label: 'Attendance', path: '/attendance', icon: CalendarCheck },
   { label: 'Fees', path: '/fees', icon: Wallet, adminOnly: true },
   { label: 'Exam results', path: '/exam-results', icon: FileText },
+  { label: 'Assignments', path: '/homework', icon: BookOpen, teacherOnly: true },
   { label: 'Announcements', path: '/announcements', icon: Megaphone },
   { label: 'Rooms', path: '/rooms', icon: DoorOpen },
   { label: 'Graduates', path: '/graduates', icon: Award },
@@ -32,6 +34,8 @@ const navItems = [
 function Sidebar({ open, onClose }) {
   const { user } = useAuth()
   const isAdmin = user?.role === 'admin'
+  const isTeacher = user?.role === 'teacher'
+  const visibleItems = navItems.filter((item) => !item.teacherOnly || isTeacher)
 
   return (
     <>
@@ -47,14 +51,12 @@ function Sidebar({ open, onClose }) {
         }`}
       >
         <div className="px-5 py-5" onClick={onClose}>
-       
-  <SchoolLogo />
- 
+          <SchoolLogo />
           <p className="mt-2 text-xs text-ink-muted">Ku soo dhawoow, {user?.name}</p>
         </div>
 
         <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-3">
-          {navItems.map((item) => {
+          {visibleItems.map((item) => {
             const restricted = item.comingSoon || (item.adminOnly && !isAdmin)
 
             if (restricted) {

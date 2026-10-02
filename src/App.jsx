@@ -15,10 +15,13 @@ import { AnnouncementsProvider } from '@/context/AnnouncementsContext'
 import { SearchProvider } from '@/context/SearchContext'
 import { RoomsProvider } from '@/context/RoomsContext'
 import { ToastProvider } from '@/context/ToastContext'
+
 import ProtectedRoute from '@/components/ProtectedRoute'
 import CatchAllRedirect from '@/components/CatchAllRedirect'
+
 import DashboardLayout from '@/layouts/DashboardLayout'
 import StudentLayout from '@/layouts/StudentLayout'
+
 import LoginPage from '@/pages/LoginPage'
 import LandingPage from '@/pages/LandingPage'
 import DashboardPage from '@/pages/DashboardPage'
@@ -34,9 +37,10 @@ import RoomsPage from '@/pages/RoomsPage'
 import GraduatesPage from '@/pages/GraduatesPage'
 import StudentRoomPage from '@/pages/StudentRoomPage'
 
-// Providers-ka xogta (backend + mock ilaa la isku xiro) dhammaantood waa in ay ka sarreeyaan Routes-ka,
-// si xogtu u wadaagto pages-ka oo dhan (Students, Attendance, Fees, Exam
-// results) — ma aha mid kasta oo state gaar ah leh.
+import HomeworkPage from '@/pages/HomeworkPage'
+import StudentHomeworkPage from '@/pages/StudentHomeworkPage'
+
+// Providers-ka xogta
 function AppProviders({ children }) {
   return (
     <ToastProvider>
@@ -51,7 +55,9 @@ function AppProviders({ children }) {
                       <TeacherAttendanceProvider>
                         <AnnouncementsProvider>
                           <SearchProvider>
-                            <RoomsProvider>{children}</RoomsProvider>
+                            <RoomsProvider>
+                              {children}
+                            </RoomsProvider>
                           </SearchProvider>
                         </AnnouncementsProvider>
                       </TeacherAttendanceProvider>
@@ -67,19 +73,19 @@ function AppProviders({ children }) {
   )
 }
 
-// GO'DOOMIN IISKUUL KASTA: AppProviders waxaa loo furaa `key={user.id}`,
-// sidaas darteed marka user kale login sameeyo (ama la ka baxo), state-ka
-// contexts-ka oo dhan waa la baabi'inayaa — iskuul B ma arki karo wax
-// ku hadhay xusuusta browser-ka ee iskuul A.
+// GO'DOOMIN IISKUUL KASTA
 function Shell() {
   const { user } = useAuth()
 
   return (
     <BrowserRouter>
       <Routes>
+
+        {/* PUBLIC PAGES */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
 
+        {/* ADMIN + TEACHER */}
         <Route
           element={
             <ProtectedRoute allowedRoles={['admin', 'teacher']}>
@@ -97,6 +103,7 @@ function Shell() {
           <Route path="/graduates" element={<GraduatesPage />} />
         </Route>
 
+        {/* ADMIN ONLY */}
         <Route
           element={
             <ProtectedRoute allowedRoles={['admin']}>
@@ -112,6 +119,20 @@ function Shell() {
           <Route path="/settings" element={<SettingsPage />} />
         </Route>
 
+        {/* TEACHER ONLY - HOMEWORK */}
+        <Route
+          element={
+            <ProtectedRoute allowedRoles={['teacher']}>
+              <AppProviders key={user?.id ?? 'anon'}>
+                <DashboardLayout />
+              </AppProviders>
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/homework" element={<HomeworkPage />} />
+        </Route>
+
+        {/* STUDENT ONLY */}
         <Route
           element={
             <ProtectedRoute allowedRoles={['student']}>
@@ -122,11 +143,14 @@ function Shell() {
           }
         >
           <Route path="/my-results" element={<StudentResultsPage />} />
+          <Route path="/my-homework" element={<StudentHomeworkPage />} />
           <Route path="/my-announcements" element={<AnnouncementsPage />} />
           <Route path="/my-room" element={<StudentRoomPage />} />
         </Route>
 
+        {/* FALLBACK */}
         <Route path="*" element={<CatchAllRedirect />} />
+
       </Routes>
     </BrowserRouter>
   )
