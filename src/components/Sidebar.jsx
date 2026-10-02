@@ -13,7 +13,7 @@ import {
   Award,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
-import SchoolLogo from '@/components/SchoolLogo'
+import brandMark from '@/assets/brand-mark.png'
 
 const navItems = [
   { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
@@ -47,7 +47,12 @@ function Sidebar({ open, onClose }) {
         }`}
       >
         <div className="px-5 py-5" onClick={onClose}>
-          <SchoolLogo />
+          <div className="flex items-center gap-2.5">
+  <img src={brandMark} alt="IskuulCaawiye" className="h-10 w-10 rounded-xl object-contain" />
+  <span className="text-base font-extrabold tracking-tight text-ink">
+    Iskuul<span className="text-emerald-600">Caawiye</span>
+  </span>
+</div>
           <p className="mt-2 text-xs text-ink-muted">Ku soo dhawoow, {user?.name}</p>
         </div>
 

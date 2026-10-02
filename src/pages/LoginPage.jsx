@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Navigate, useNavigate } from 'react-router-dom'
-import { GraduationCap } from 'lucide-react'
+import brandMark from '@/assets/brand-mark.png'
 import { useAuth } from '@/hooks/useAuth'
 import { getHomeRoute } from '@/lib/routes'
 import WhatsAppButton from '@/components/WhatsAppButton'
@@ -106,13 +106,15 @@ function LoginPage() {
       <Card className="w-full max-w-sm">
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand text-white sm:h-10 sm:w-10">
-              <GraduationCap size={22} />
-            </div>
-            <span className="text-base font-medium text-ink sm:text-sm">
-              Maamulka Iskuulka
-            </span>
-          </div>
+  <img
+    src={brandMark}
+    alt="IskuulCaawiye logo"
+    className="h-11 w-11 rounded-xl object-contain sm:h-10 sm:w-10"
+  />
+  <span className="text-base font-extrabold tracking-tight text-ink sm:text-sm">
+    Iskuul<span className="text-emerald-600">Caawiye</span>
+  </span>
+</div>
           <ThemeToggle />
         </div>
 
