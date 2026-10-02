@@ -70,10 +70,31 @@ export function AttendanceProvider({ children }) {
       loadAttendance(current.classId, current.sectionId, current.date, current.session)
     }
   }
-
+  // Ardayda aan weli la calaamadin oo dhan "present" ka dhig (backend-ku
+  // kuwa hore loo calaamadiyay ma taabto), kadib xogta dib u soo qaad.
+  async function markAllPresent() {
+    if (!current) return
+    try {
+      const res = await api.post('/attendance/bulk-present', {
+        classId: current.classId,
+        sectionId: current.sectionId || undefined,
+        date: current.date,
+        session: SESSION_CODES[current.session],
+      })
+      showToast(
+        res.marked === 0
+          ? 'Dhammaan ardayda hore ayaa loo calaamadiyay.'
+          : `${res.marked} arday present ayaa laga dhigay.`,
+        'success'
+      )
+    } catch (err) {
+      showToast(err.message, 'error')
+    }
+    loadAttendance(current.classId, current.sectionId, current.date, current.session)
+  }
   return (
     <AttendanceContext.Provider
-      value={{ rows, loading, loadAttendance, getStatus, getPreviousDayStatus, mark }}
+     value={{ rows, loading, loadAttendance, getStatus, getPreviousDayStatus, mark, markAllPresent }}
     >
       {children}
     </AttendanceContext.Provider>

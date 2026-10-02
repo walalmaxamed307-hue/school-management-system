@@ -1,13 +1,12 @@
-import { useMemo, useState } from 'react'
-import { ArrowUp, ArrowDown, ChevronLeft, ChevronRight } from 'lucide-react'
+
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 // columns: [{ key, label, render?(row), sortable? (default: true if no render) }]
 // data: array of row objects (each needs a unique `id`)
-const PAGE_SIZE = 10
 
 function Table({ columns, data, emptyMessage = 'Wax lama helin' }) {
   const [sort, setSort] = useState(null) // { key, dir: 'asc' | 'desc' }
-  const [page, setPage] = useState(0)
+ 
 
   function toggleSort(col) {
     if (col.render && !col.sortable) return
@@ -16,7 +15,7 @@ function Table({ columns, data, emptyMessage = 'Wax lama helin' }) {
       if (prev.dir === 'asc') return { key: col.key, dir: 'desc' }
       return null
     })
-    setPage(0)
+   
   }
 
   const sorted = useMemo(() => {
@@ -30,9 +29,7 @@ function Table({ columns, data, emptyMessage = 'Wax lama helin' }) {
     })
   }, [data, sort])
 
-  const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE))
-  const pageRows = sorted.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE)
-
+ const pageRows = sorted
   return (
     <>
     <div className="print:hidden">
@@ -124,27 +121,7 @@ function Table({ columns, data, emptyMessage = 'Wax lama helin' }) {
         )}
       </div>
 
-      {totalPages > 1 && (
-        <div className="mt-3 flex items-center justify-between text-sm text-ink-muted">
-          <button
-            onClick={() => setPage((p) => Math.max(0, p - 1))}
-            disabled={page === 0}
-            className="flex items-center gap-1 disabled:opacity-40"
-          >
-            <ChevronLeft size={16} /> Hore
-          </button>
-          <span>
-            Bogga {page + 1} / {totalPages}
-          </span>
-          <button
-            onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
-            disabled={page >= totalPages - 1}
-            className="flex items-center gap-1 disabled:opacity-40"
-          >
-            Xiga <ChevronRight size={16} />
-          </button>
-        </div>
-      )}
+      
       </div>
 
       {/* Print: DHAMMAAN sorted rows (ma aha kuwa bogga hadda) — pagination-ku

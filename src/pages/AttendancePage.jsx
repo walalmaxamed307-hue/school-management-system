@@ -29,7 +29,7 @@ const statusLabel = { present: 'Present', absent: 'Absent', late: 'Late', excuse
 
 function AttendancePage() {
   const { classes } = useClasses()
-  const { rows, loading, loadAttendance, getStatus, getPreviousDayStatus, mark } = useAttendance()
+ const { rows, loading, loadAttendance, getStatus, getPreviousDayStatus, mark, markAllPresent } = useAttendance()
   const { user } = useAuth()
   const { query } = useSearch()
   const isTeacher = user?.role === 'teacher'
@@ -88,7 +88,12 @@ function AttendancePage() {
     const bWasAbsent = b.previousDayStatus === 'absent' ? 0 : 1
     return aWasAbsent - bWasAbsent
   })
+const unmarkedCount = rows.filter((r) => !r.status).length
 
+function handleAllPresent() {
+  if (!confirm(`${unmarkedCount} arday oo aan weli la calaamadin present ma ka dhigaa? Kuwa hore loo calaamadiyay lama beddelayo.`)) return
+  markAllPresent()
+}
   return (
     <div>
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -157,12 +162,22 @@ function AttendancePage() {
         </div>
       </div>
 
-      <p className="mb-3 text-xs text-ink-muted">
-        {selectedClass}
-        {selectedClassObj?.hasSections && selectedSection ? ` – Section ${selectedSection}` : ''}:{' '}
-        <strong>{filteredRows.length}</strong> arday
-      </p>
-
+      <div className="mb-3 flex items-center justify-between gap-3">
+  <p className="text-xs text-ink-muted">
+    {selectedClass}
+    {selectedClassObj?.hasSections && selectedSection ? ` – Section ${selectedSection}` : ''}:{' '}
+    <strong>{filteredRows.length}</strong> arday
+  </p>
+  {sectionOk && (
+    <Button
+      size="sm"
+      onClick={handleAllPresent}
+      disabled={loading || unmarkedCount === 0}
+    >
+      All Present
+    </Button>
+  )}
+</div>
       {!sectionOk ? (
         <p className="rounded-lg bg-canvas px-3 py-6 text-center text-sm text-ink-muted">
           Fasalkan sections buu leeyahay — dooro section marka hore.
