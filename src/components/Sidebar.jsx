@@ -17,7 +17,7 @@ import { useAuth } from '@/hooks/useAuth'
 import SchoolLogo from '@/components/SchoolLogo'
 
 const navItems = [
-  { label: 'Dashboard', path: '/', icon: LayoutDashboard },
+  { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
   { label: 'Students', path: '/students', icon: Users, adminOnly: true },
   { label: 'Teachers', path: '/teachers', icon: GraduationCap, adminOnly: true },
   { label: 'Attendance', path: '/attendance', icon: CalendarCheck },

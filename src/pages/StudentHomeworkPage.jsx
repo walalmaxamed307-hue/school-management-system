@@ -40,7 +40,7 @@ function StudentHomeworkPage() {
     <div>
       <h1 className="mb-1 text-xl font-medium text-ink">Assignments</h1>
       <p className="mb-4 text-sm text-ink-muted">
-        Akhri su’aasha, buugaagtaadana ka shaqayso.
+        Akhri su’aasha, buugaadana uga shaqee!
       </p>
 
       {subjects.length > 1 && (
