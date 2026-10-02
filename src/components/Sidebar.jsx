@@ -47,12 +47,9 @@ function Sidebar({ open, onClose }) {
         }`}
       >
         <div className="px-5 py-5" onClick={onClose}>
-          <div className="flex items-center gap-2.5">
-  <img src={brandMark} alt="IskuulCaawiye" className="h-10 w-10 rounded-xl object-contain" />
-  <span className="text-base font-extrabold tracking-tight text-ink">
+       
   <SchoolLogo />
-  </span>
-</div>
+ 
           <p className="mt-2 text-xs text-ink-muted">Ku soo dhawoow, {user?.name}</p>
         </div>
 
