@@ -1,5 +1,3 @@
-
-import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { ArrowUp, ArrowDown } from 'lucide-react'
 // columns: [{ key, label, render?(row), sortable? (default: true if no render) }]
