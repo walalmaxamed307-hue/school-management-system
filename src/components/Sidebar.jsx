@@ -14,7 +14,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import brandMark from '@/assets/brand-mark.png'
-
+import SchoolLogo from '@/components/SchoolLogo'
 const navItems = [
   { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
   { label: 'Students', path: '/students', icon: Users, adminOnly: true },
