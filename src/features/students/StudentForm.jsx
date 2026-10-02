@@ -115,7 +115,6 @@ function StudentForm({ defaultValues, classes, schools = [], onSubmit, onCancel,
         placeholder="06XXXXXXXX"
         error={errors.parentPhone?.message}
         {...register('parentPhone', {
-          required: 'Telefoonka waa loo baahan yahay',
           pattern: {
             value: /^0\d{9}$/,
             message: 'Lambarka waa in uu noqdaa 10 xaraf (0 ka bilaaban)',
