@@ -117,7 +117,7 @@ function StudentForm({ defaultValues, classes, schools = [], onSubmit, onCancel,
         {...register('parentPhone', {
           pattern: {
             value: /^0\d{9}$/,
-            message: 'Lambarka waa in uu noqdaa 10 xaraf (0 ka bilaaban)',
+            message: 'Lambarka waa in uu noqdaa 10 xaraf (0 ka bilaabma)',
           },
         })}
       />
