@@ -69,6 +69,14 @@ function AttendanceButtons({ teacherId }) {
   )
 }
 
+function FeeManagerBadge() {
+  return (
+    <span className="mt-0.5 inline-block rounded-full bg-primary-50 px-2 py-0.5 text-xs font-medium text-primary-600">
+      Fee manager
+    </span>
+  )
+}
+
 function SubjectChips({ assignments, max = 3 }) {
   if (assignments.length === 0) return <span className="text-ink-muted">—</span>
   const shown = assignments.slice(0, max)
@@ -223,6 +231,7 @@ function TeachersPage() {
                       <div className="min-w-0">
                         <p className="truncate font-medium text-ink">{row.name}</p>
                         <p className="truncate text-xs text-ink-muted">{row.email}</p>
+                        {row.isFeeManager && <FeeManagerBadge />}
                       </div>
                     </div>
                   </td>
@@ -267,6 +276,7 @@ function TeachersPage() {
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium text-ink">{row.name}</p>
                     <p className="truncate text-xs text-ink-muted">{row.email}</p>
+                    {row.isFeeManager && <FeeManagerBadge />}
                   </div>
                 </div>
                 {actionButtons(row)}

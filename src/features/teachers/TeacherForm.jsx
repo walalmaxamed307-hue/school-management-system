@@ -78,6 +78,7 @@ function TeacherForm({ defaultValues, classes, subjects, teachers, onSubmit, onC
       password: '',
       homeroomClassId: defaultValues?.classId ?? '',
       homeroomSectionId: defaultValues?.sectionId ?? '',
+      isFeeManager: defaultValues?.isFeeManager ?? false,
     },
   })
 
@@ -154,6 +155,7 @@ function TeacherForm({ defaultValues, classes, subjects, teachers, onSubmit, onC
         ? { classId: data.homeroomClassId, sectionId: homeroomClass?.hasSections ? data.homeroomSectionId : null }
         : null,
       assignments: blocksToAssignments(blocks, classes),
+      isFeeManager: !!data.isFeeManager,
     }
     if (data.password) payload.password = data.password
     await onSubmit(payload)
@@ -187,6 +189,17 @@ function TeacherForm({ defaultValues, classes, subjects, teachers, onSubmit, onC
           })}
         />
       </div>
+
+      <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border p-3">
+        <input type="checkbox" className="mt-0.5" {...register('isFeeManager')} />
+        <span>
+          <span className="block text-sm font-medium text-ink">Fee manager</span>
+          <span className="block text-xs text-ink-muted">
+            Macalinkan wuxuu geli karaa bogga Fees, wuxuuna maamuli karaa lacagaha ardayda. Haddii
+            aan la calaamadin, wuxuu noqonayaa macalin caadi ah.
+          </span>
+        </span>
+      </label>
 
       <div className="rounded-lg border border-border p-3">
         <p className="mb-2 text-sm font-medium text-ink">Horjoogaha fasalka (attendance) — ikhtiyaari</p>

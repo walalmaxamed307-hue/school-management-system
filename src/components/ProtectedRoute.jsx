@@ -1,8 +1,9 @@
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
-import { getHomeRoute } from '@/lib/routes'
+import { getHomeRoute, hasFeeAccess } from '@/lib/routes'
 
-function ProtectedRoute({ children, allowedRoles }) {
+// feeAccess: kaliya admin ama macalin fee manager ah (user.isFeeManager).
+function ProtectedRoute({ children, allowedRoles, feeAccess = false }) {
   const { user, loading } = useAuth()
 
   if (loading) {
@@ -15,6 +16,10 @@ function ProtectedRoute({ children, allowedRoles }) {
 
   if (!user) {
     return <Navigate to="/login" replace />
+  }
+
+  if (feeAccess && !hasFeeAccess(user)) {
+    return <Navigate to={getHomeRoute(user.role)} replace />
   }
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {

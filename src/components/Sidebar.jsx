@@ -15,13 +15,14 @@ import {
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import SchoolLogo from '@/components/SchoolLogo'
+import { hasFeeAccess } from '@/lib/routes'
 
 const navItems = [
-  { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+  { label: 'Dashboard', path: '/', icon: LayoutDashboard },
   { label: 'Students', path: '/students', icon: Users, adminOnly: true },
   { label: 'Teachers', path: '/teachers', icon: GraduationCap, adminOnly: true },
   { label: 'Attendance', path: '/attendance', icon: CalendarCheck },
-  { label: 'Fees', path: '/fees', icon: Wallet, adminOnly: true },
+  { label: 'Fees', path: '/fees', icon: Wallet, feeAccess: true },
   { label: 'Exam results', path: '/exam-results', icon: FileText },
   { label: 'Assignments', path: '/homework', icon: BookOpen, teacherOnly: true },
   { label: 'Announcements', path: '/announcements', icon: Megaphone },
@@ -35,6 +36,7 @@ function Sidebar({ open, onClose }) {
   const { user } = useAuth()
   const isAdmin = user?.role === 'admin'
   const isTeacher = user?.role === 'teacher'
+  const canFees = hasFeeAccess(user)
   const visibleItems = navItems.filter((item) => !item.teacherOnly || isTeacher)
 
   return (
@@ -57,7 +59,10 @@ function Sidebar({ open, onClose }) {
 
         <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-3">
           {visibleItems.map((item) => {
-            const restricted = item.comingSoon || (item.adminOnly && !isAdmin)
+            const restricted =
+              item.comingSoon ||
+              (item.adminOnly && !isAdmin) ||
+              (item.feeAccess && !canFees)
 
             if (restricted) {
               return (

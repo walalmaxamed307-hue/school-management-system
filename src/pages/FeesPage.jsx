@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Pencil, Printer, Info } from 'lucide-react'
+import { useAuth } from '@/hooks/useAuth'
 import { useClasses } from '@/hooks/useClasses'
 import { useFees } from '@/hooks/useFees'
 import { useSchoolSettings } from '@/hooks/useSchoolSettings'
@@ -20,6 +21,8 @@ const statusStyle = {
 const statusLabel = { paid: 'Paid', partial: 'Partial', unpaid: 'Unpaid' }
 
 function FeesPage() {
+  const { user } = useAuth()
+  const isAdmin = user?.role === 'admin'
   const { classes } = useClasses()
   const { rows, loading, loadFees, payFee, standardAmount } = useFees()
   const { settings } = useSchoolSettings()
@@ -139,7 +142,7 @@ function FeesPage() {
         <div>
           <p className="text-sm font-medium text-ink">Qiimaha caadiga ah (standard)</p>
           <p className="text-xs text-ink-muted">
-            Arday kasta oo cusub si toos ah ayuu u helayaa qiimahan — beddel Settings-ka
+            Arday kasta oo cusub si toos ah ayuu u helayaa qiimahan{isAdmin ? ' — beddel Settings-ka' : ''}
           </p>
         </div>
         <span className="text-sm font-medium text-ink">${standardAmount}</span>
@@ -245,9 +248,11 @@ function FeesPage() {
           <div className="flex flex-col gap-4">
             <div className="rounded-lg bg-canvas px-3 py-2 text-sm text-ink">
               Qiimaha guud: <strong>${editingStudent?.amountDue}</strong>{' '}
-              <span className="text-xs text-ink-muted">
-                (beddel Settings-ka haddii uu qaldan yahay)
-              </span>
+              {isAdmin && (
+                <span className="text-xs text-ink-muted">
+                  (beddel Settings-ka haddii uu qaldan yahay)
+                </span>
+              )}
             </div>
             <Input
               label="Intii la bixiyay ($)"

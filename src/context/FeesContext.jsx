@@ -1,4 +1,4 @@
-import { createContext, useCallback, useState } from 'react'
+import { createContext, useCallback, useRef, useState } from 'react'
 import { api } from '@/lib/api'
 import { useSchoolSettings } from '@/hooks/useSchoolSettings'
 import { useToast } from '@/hooks/useToast'
@@ -15,28 +15,31 @@ export function FeesProvider({ children }) {
   const [current, setCurrent] = useState(null) // { classId, sectionId, month }
   const { settings } = useSchoolSettings()
   const { showToast } = useToast()
+  const reqId = useRef(0)
   const standardAmount = settings.standardFeeAmount
 
-  const loadFees = useCallback(
-    async (classId, sectionId, month) => {
-      if (!classId || !month) {
-        setRows([])
-        setCurrent(null)
-        return
-      }
-      setCurrent({ classId, sectionId, month })
-      setLoading(true)
-      try {
-        setRows(await api.get('/fees', { classId, sectionId: sectionId || undefined, month }))
-      } catch (err) {
-        showToast(err.message, 'error')
-        setRows([])
-      } finally {
-        setLoading(false)
-      }
-    },
-    [showToast]
-  )
+  
+const loadFees = useCallback(
+  async (classId, sectionId, month, { silent = false } = {}) => {
+    const myId = ++reqId.current
+    if (!classId || !month) { setRows([]); setCurrent(null); return }
+    setCurrent({ classId, sectionId, month })
+    if (!silent) { setRows([]); setLoading(true) }   // ha tusin fasalkii hore
+    try {
+      const data = await api.get('/fees', { classId, sectionId: sectionId || undefined, month })
+      if (myId !== reqId.current) return              // jawaab duug ah, iska dhaaf
+      const list = Array.isArray(data) ? data : []
+      setRows(list.map((r) => ({ ...r, feeId: r.id, id: r.enrollmentId }))) // key sax ah
+    } catch (err) {
+      if (myId !== reqId.current) return
+      showToast(err.message, 'error')
+      setRows([])
+    } finally {
+      if (myId === reqId.current) setLoading(false)
+    }
+  },
+  [showToast]
+)
 
   function getFee(enrollmentId) {
     return rows.find((r) => r.enrollmentId === enrollmentId) ?? null

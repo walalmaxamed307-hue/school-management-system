@@ -16,6 +16,7 @@ async function loadTeachers() {
       name: t.name,
       email: t.email ?? '',
       phone: t.phone ?? '',
+      isFeeManager: !!t.isFeeManager,
       // Homeroom (horjoogaha attendance-ka): hal fasal (+section)
       class: t.class,
       section: t.section ?? null,
