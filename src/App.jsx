@@ -34,6 +34,7 @@ import GraduatesPage from '@/pages/GraduatesPage'
 import StudentRoomPage from '@/pages/StudentRoomPage'
 import HomeworkPage from '@/pages/HomeworkPage'
 import StudentHomeworkPage from '@/pages/StudentHomeworkPage'
+import LandingPage from './pages/LandingPage'
 
 // Providers-ka xogta (backend + mock ilaa la isku xiro) dhammaantood waa in ay ka sarreeyaan Routes-ka,
 // si xogtu u wadaagto pages-ka oo dhan (Students, Attendance, Fees, Exam
@@ -78,7 +79,8 @@ function Shell() {
     <AppProviders key={user?.id ?? 'anon'}>
         <BrowserRouter>
           <Routes>
-            <Route path="/login" element={<LoginPage />} />
+              <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<LoginPage/>} />
 
             <Route
               element={
@@ -87,7 +89,7 @@ function Shell() {
                 </ProtectedRoute>
               }
             >
-              <Route path="/" element={<DashboardPage />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/attendance" element={<AttendancePage />} />
               <Route path="/exam-results" element={<ExamResultsPage />} />
               <Route path="/announcements" element={<AnnouncementsPage />} />

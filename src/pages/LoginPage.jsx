@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import { Navigate, useNavigate } from 'react-router-dom'
 import brandMark from '@/assets/brand-mark.png'
 import { useAuth } from '@/hooks/useAuth'
-import { getHomeRoute } from '@/lib/routes'
+
 import WhatsAppButton from '@/components/WhatsAppButton'
 import ThemeToggle from '@/components/ThemeToggle'
 import { Button, Input, Card } from '@/components/ui'
@@ -97,9 +97,15 @@ function LoginPage() {
   const [tab, setTab] = useState('staff')
   const { user } = useAuth()
 
-  // Login kadib providers-ka waa la dib-u-furaa (go'doomin iskuul kasta),
-  // sidaas darteed halkan ayaa user-ka loo gudbiyaa gurigiisa.
-  if (user) return <Navigate to={getHomeRoute(user.role)} replace />
+  if (user) {
+    return (
+      <Navigate
+        to={user.role === 'student' ? '/my-results' : '/dashboard'}
+        replace
+      />
+    )
+  }
+
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-canvas px-4 py-10">

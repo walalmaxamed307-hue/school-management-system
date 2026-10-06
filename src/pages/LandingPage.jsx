@@ -71,7 +71,7 @@ const featureCards = [
     icon: BookOpen,
     title: 'Academic Years',
     body: 'Kala ilaali sannadaha waxbarashada si xogta sanadkii hore iyo tan hadda socda aysan isugu dhex milmin.',
-  },
+  }, 
 ]
 
 const roleCards = [
