@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Users, GraduationCap, Wallet, UserCheck, ShieldAlert } from 'lucide-react'
+import { Users, GraduationCap, Wallet, Sun, Sunset, ShieldAlert } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { api } from '@/lib/api'
 import { useToast } from '@/hooks/useToast'
@@ -105,15 +105,20 @@ function DashboardPage() {
 
   const monthName = new Date(stats.month + '-01').toLocaleDateString('en-US', { month: 'long' })
 
-  // % ardayda joogta maanta (arday ahaan: ugu yaraan hal session present/late).
-  const todayStudents = stats.attendanceTodayStudents
-  const presentPercent = todayStudents?.ratePercent ?? null
-  const presentTone =
-    presentPercent === null ? 'neutral' : presentPercent >= 90 ? 'primary' : presentPercent >= 75 ? 'warning' : 'danger'
-  const presentLabel =
-    presentPercent === null
-      ? 'Joogitaanka maanta (weli lama calaamadin)'
-      : `Joogitaanka maanta (${todayStudents.attended}/${todayStudents.marked} arday)`
+  // % joogitaanka — session kasta GOONI (Kahor Break / Kadib Break), ma aha
+  // isku-darsan: arday subaxdii yimid laakiin galabtii maqan wuxuu kordhiyaa
+  // kahor-break kaliya. joogo = present + late; tirada guud = dhammaan
+  // la calaamadiyay (oo ay ku jiraan absent iyo excused).
+  function sessionRate(session) {
+    const attended = session.present + session.late
+    const marked = attended + session.absent + session.excused
+    return { attended, marked, percent: marked > 0 ? Math.round((attended / marked) * 100) : null }
+  }
+  const rateTone = (p) => (p === null ? 'neutral' : p >= 90 ? 'primary' : p >= 75 ? 'warning' : 'danger')
+  const beforeRate = sessionRate(beforeBreak)
+  const afterRate = sessionRate(afterBreak)
+  const rateLabel = (title, r) =>
+    r.percent === null ? `${title} (weli lama calaamadin)` : `${title} (${r.attended}/${r.marked} arday)`
 
   const riskCount = risk?.total ?? null
   const riskTone =
@@ -141,7 +146,7 @@ function DashboardPage() {
     <div>
       <h1 className="mb-4 text-xl font-medium text-ink">Dashboard</h1>
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Ardayda guud" value={stats.totalStudents} icon={Users} />
         <StatCard label="Macallimiinta" value={stats.totalTeachers} icon={GraduationCap} />
         <StatCard label="Lacag aan la bixin (bishan)" value={unpaid + partial} icon={Wallet} tone={feesTone} />
@@ -152,10 +157,16 @@ function DashboardPage() {
           tone="primary"
         />
         <StatCard
-          label={presentLabel}
-          value={presentPercent === null ? '—' : `${presentPercent}%`}
-          icon={UserCheck}
-          tone={presentTone}
+          label={rateLabel('Joogitaanka Kahor Break', beforeRate)}
+          value={beforeRate.percent === null ? '—' : `${beforeRate.percent}%`}
+          icon={Sun}
+          tone={rateTone(beforeRate.percent)}
+        />
+        <StatCard
+          label={rateLabel('Joogitaanka Kadib Break', afterRate)}
+          value={afterRate.percent === null ? '—' : `${afterRate.percent}%`}
+          icon={Sunset}
+          tone={rateTone(afterRate.percent)}
         />
         {isAdmin && (
           <StatCard
