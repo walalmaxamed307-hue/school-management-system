@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
-import { Users, GraduationCap, Wallet } from 'lucide-react'
+import { Users, GraduationCap, Wallet, UserCheck, ShieldAlert } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { api } from '@/lib/api'
 import { useToast } from '@/hooks/useToast'
+import { useAuth } from '@/hooks/useAuth'
 import { Card } from '@/components/ui'
+import RiskStudentsModal from '@/components/RiskStudentsModal'
 
 const toneClasses = {
   primary: 'bg-primary-50 text-primary-600',
@@ -12,9 +14,9 @@ const toneClasses = {
   neutral: 'bg-canvas text-ink-muted',
 }
 
-function StatCard({ label, value, icon: Icon, tone = 'neutral' }) {
-  return (
-    <Card className="flex items-center gap-3">
+function StatCard({ label, value, icon: Icon, tone = 'neutral', onClick }) {
+  const card = (
+    <Card className={`flex items-center gap-3 ${onClick ? 'transition-colors hover:border-primary-500' : ''}`}>
       <div className={`shrink-0 rounded-lg p-2.5 ${toneClasses[tone]}`}>
         <Icon size={20} />
       </div>
@@ -23,6 +25,12 @@ function StatCard({ label, value, icon: Icon, tone = 'neutral' }) {
         <p className="truncate text-xs text-ink-muted">{label}</p>
       </div>
     </Card>
+  )
+  if (!onClick) return card
+  return (
+    <button type="button" onClick={onClick} className="block w-full text-left">
+      {card}
+    </button>
   )
 }
 
@@ -33,6 +41,26 @@ function DashboardPage() {
   const [stats, setStats] = useState(null)
   const [loading, setLoading] = useState(true)
   const { showToast } = useToast()
+  const { user } = useAuth()
+  const isAdmin = user?.role === 'admin'
+  // Risk-ku wuxuu leeyahay wicitaankiisa gooni ah (admin kaliya) — haddii uu
+  // fashilo, dashboard-ka kale wuu sii shaqeynayaa (box-ku wuxuu muujiyaa "—").
+  const [risk, setRisk] = useState(null)
+  const [riskOpen, setRiskOpen] = useState(false)
+
+  useEffect(() => {
+    if (!isAdmin) return undefined
+    let cancelled = false
+    api
+      .get('/dashboard/risk-students')
+      .then((d) => {
+        if (!cancelled) setRisk(d)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [isAdmin])
 
   useEffect(() => {
     let cancelled = false
@@ -77,6 +105,20 @@ function DashboardPage() {
 
   const monthName = new Date(stats.month + '-01').toLocaleDateString('en-US', { month: 'long' })
 
+  // % ardayda joogta maanta (arday ahaan: ugu yaraan hal session present/late).
+  const todayStudents = stats.attendanceTodayStudents
+  const presentPercent = todayStudents?.ratePercent ?? null
+  const presentTone =
+    presentPercent === null ? 'neutral' : presentPercent >= 90 ? 'primary' : presentPercent >= 75 ? 'warning' : 'danger'
+  const presentLabel =
+    presentPercent === null
+      ? 'Joogitaanka maanta (weli lama calaamadin)'
+      : `Joogitaanka maanta (${todayStudents.attended}/${todayStudents.marked} arday)`
+
+  const riskCount = risk?.total ?? null
+  const riskTone =
+    riskCount === null ? 'neutral' : riskCount === 0 ? 'primary' : risk.highCount > 0 ? 'danger' : 'warning'
+
   // Kahor Break iyo Kadib Break — labadaba si gooni ah ayey isu taagayaan
   // chart-ka, ma aha isku darsan (arday hal session ka qeyb-galay uma
   // baahna inuu ku jiro tirada session-ka kale).
@@ -99,7 +141,7 @@ function DashboardPage() {
     <div>
       <h1 className="mb-4 text-xl font-medium text-ink">Dashboard</h1>
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
         <StatCard label="Ardayda guud" value={stats.totalStudents} icon={Users} />
         <StatCard label="Macallimiinta" value={stats.totalTeachers} icon={GraduationCap} />
         <StatCard label="Lacag aan la bixin (bishan)" value={unpaid + partial} icon={Wallet} tone={feesTone} />
@@ -109,7 +151,23 @@ function DashboardPage() {
           icon={Wallet}
           tone="primary"
         />
+        <StatCard
+          label={presentLabel}
+          value={presentPercent === null ? '—' : `${presentPercent}%`}
+          icon={UserCheck}
+          tone={presentTone}
+        />
+        {isAdmin && (
+          <StatCard
+            label={riskCount === null ? 'Ardayda khatarta ah' : 'Ardayda khatarta ah — guji'}
+            value={riskCount === null ? '—' : riskCount}
+            icon={ShieldAlert}
+            tone={riskTone}
+            onClick={riskCount === null ? undefined : () => setRiskOpen(true)}
+          />
+        )}
       </div>
+      {isAdmin && <RiskStudentsModal open={riskOpen} onClose={() => setRiskOpen(false)} data={risk} />}
 
       <Card className="mt-4 overflow-hidden">
         <p className="mb-4 truncate text-sm font-medium text-ink">

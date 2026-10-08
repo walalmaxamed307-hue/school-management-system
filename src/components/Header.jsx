@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { KeyRound, LogOut, Menu, Search, User, GraduationCap } from 'lucide-react'
+import { LogOut, Menu, Search, User, GraduationCap, KeyRound } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { useStudents } from '@/hooks/useStudents'
@@ -21,7 +21,7 @@ function Header({ onMenuClick }) {
   const { query, setQuery } = useSearch()
   const navigate = useNavigate()
   const location = useLocation()
-  const [passwordOpen, setPasswordOpen] = useState(false)
+  const [passwordModalOpen, setPasswordModalOpen] = useState(false)
   const isAdmin = user?.role === 'admin'
   const showSearch = location.pathname !== '/settings'
 
@@ -106,19 +106,19 @@ function Header({ onMenuClick }) {
         <Button
           variant="secondary"
           size="sm"
-          onClick={() => setPasswordOpen(true)}
+          onClick={() => setPasswordModalOpen(true)}
           aria-label="Beddel password-ka"
           title="Beddel password-ka"
         >
           <KeyRound size={16} />
-          <span className="hidden md:inline">Password</span>
+          <span className="hidden sm:inline">Password</span>
         </Button>
         <Button variant="secondary" size="sm" onClick={handleLogout}>
           <LogOut size={16} />
           <span className="hidden sm:inline">Ka bax</span>
         </Button>
       </div>
-      <ChangePasswordModal open={passwordOpen} onClose={() => setPasswordOpen(false)} />
+      <ChangePasswordModal open={passwordModalOpen} onClose={() => setPasswordModalOpen(false)} />
     </header>
   )
 }
