@@ -7,6 +7,7 @@ import {
   Check,
   ChevronDown,
   ClipboardList,
+  Crown,
   GraduationCap,
   Megaphone,
   Menu,
@@ -71,7 +72,17 @@ const featureCards = [
     icon: BookOpen,
     title: 'Academic Years',
     body: 'Kala ilaali sannadaha waxbarashada si xogta sanadkii hore iyo tan hadda socda aysan isugu dhex milmin.',
-  }, 
+  },
+  {
+    icon: ClipboardList,
+    title: 'Assignments & Online Lessons',
+    body: 'Macallinku wuxuu post-gareyn karaa casharro, shaqo-guri iyo faylal; ardayguna account-kiisa ayuu si ammaan ah uga arkaa ama uga dejistaa.',
+  },
+  {
+    icon: Crown,
+    title: 'Owner Overview',
+    body: 'Milkiilaha iskuulka wuxuu helayaa dashboard akhris-kaliya ah oo muujinaya xaaladda iskuulka, attendance, fees iyo waxyaabaha u baahan feejignaan.',
+  },
 ]
 
 const roleCards = [
@@ -80,21 +91,28 @@ const roleCards = [
     eyebrow: 'Maamulka',
     title: 'Admin',
     description: 'Admin-ku wuxuu hayaa maamulka ugu ballaaran ee iskuulka.',
-    items: ['Ardayda iyo xogtooda', 'Macallimiinta', 'Fees-ka', 'Settings-ka iskuulka', 'Exams, attendance & announcements'],
+    items: ['Ardayda iyo xogtooda', 'Macallimiinta iyo assignments-ka', 'Fees-ka iyo Risk Students', 'Settings-ka iyo logo-ga iskuulka', 'Exams, attendance & announcements'],
   },
   {
     icon: GraduationCap,
     eyebrow: 'Macallimiinta',
     title: 'Teacher',
     description: 'Macallinku wuxuu helayaa qaybaha uu shaqadiisa maalinlaha ah u baahan yahay.',
-    items: ['Dashboard', 'Attendance', 'Exam results', 'Announcements', 'Exam rooms'],
+    items: ['Dashboard iyo attendance', 'Exam results & announcements', 'Assignments iyo online lessons', 'Upload/download files', 'Exam rooms'],
   },
   {
     icon: Sparkles,
     eyebrow: 'Ardayda',
     title: 'Student',
     description: 'Ardaygu ma aha qof xogtiisa laga maamulo oo keliya — wuxuu si toos ah uga qayb qaataa systemka.',
-    items: ['Arag natiijooyinka la publish gareeyay', 'Arag ogeysiisyada iskuulka', 'Arag exam room-ka', 'Hel akoon u gaar ah', 'Macluumaad cad oo fudud'],
+    items: ['Arag natiijooyinka la publish gareeyay', 'Arag lessons & assignments', 'Download faylasha macallinka', 'Arag ogeysiisyada iyo exam room-ka', 'Hel akoon u gaar ah'],
+  },
+  {
+    icon: Crown,
+    eyebrow: 'Milkiilaha',
+    title: 'Owner',
+    description: 'Milkiiluhu wuxuu si ammaan ah ula socdaa xaaladda iskuulkiisa, isaga oo aan maamulin xogta maalinlaha ah.',
+    items: ['Overview akhris-kaliya ah', 'Attendance iyo fees insights', 'Natiijooyinka iyo ardayda khatarta ah', 'Xog kooban oo si toos ah u cusboonaata'],
   },
 ]
 
@@ -272,8 +290,8 @@ function LandingPage() {
 
               <div className="mt-9 grid max-w-xl grid-cols-2 gap-3 sm:grid-cols-3">
                 {[
-                  ['3', 'roles'],
-                  ['8+', 'qaybood oo muhiim ah'],
+                  ['4', 'roles'],
+                  ['10+', 'qaybood oo muhiim ah'],
                   ['1', 'system oo iskuulka oo dhan ah'],
                 ].map(([value, label]) => (
                   <div key={label} className="rounded-2xl border border-slate-200/80 bg-white/80 px-4 py-4 dark:border-white/10 dark:bg-white/5">
@@ -403,7 +421,7 @@ function LandingPage() {
               <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300">Admin, macallin iyo arday mid walba wuxuu leeyahay access ku habboon doorkiisa. Taas ayaa systemka ka dhigaysa mid cad oo ammaan badan marka loo eego in qof walba la siiyo dhammaan menu-yada.</p>
             </div>
 
-            <div className="mt-12 grid gap-5 lg:grid-cols-3">
+            <div className="mt-12 grid gap-5 lg:grid-cols-4">
               {roleCards.map((role) => {
                 const Icon = role.icon
                 return (
