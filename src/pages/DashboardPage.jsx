@@ -1,217 +1,35 @@
-import { useEffect, useState } from 'react'
-import { Users, GraduationCap, Wallet, Sun, Sunset, ShieldAlert } from 'lucide-react'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { useCallback, useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { AlertTriangle, ArrowRight, BookOpen, CalendarCheck, GraduationCap, RefreshCw, Sun, Sunset, Users, Wallet } from 'lucide-react'
 import { api } from '@/lib/api'
 import { useToast } from '@/hooks/useToast'
 import { useAuth } from '@/hooks/useAuth'
-import { Card } from '@/components/ui'
+import { useSchoolSettings } from '@/hooks/useSchoolSettings'
+import { Button, Card } from '@/components/ui'
 import RiskStudentsModal from '@/components/RiskStudentsModal'
 
-const toneClasses = {
-  primary: 'bg-primary-50 text-primary-600',
-  warning: 'bg-warning-50 text-warning-500',
-  danger: 'bg-danger-50 text-danger-500',
-  neutral: 'bg-canvas text-ink-muted',
-}
+const palette = { primary: 'bg-primary-50 text-primary-600', warning: 'bg-warning-50 text-warning-500', danger: 'bg-danger-50 text-danger-500' }
+function Metric({ icon: Icon, label, value, note, tone = 'primary' }) { return <Card className="relative overflow-hidden p-4 sm:p-5"><div className="flex items-start justify-between gap-3"><div><p className="text-xs font-medium uppercase tracking-wide text-ink-muted">{label}</p><p className="mt-2 text-2xl font-semibold tracking-tight text-ink sm:text-3xl">{value}</p>{note && <p className="mt-1 text-xs text-ink-muted">{note}</p>}</div><span className={`rounded-xl p-2.5 ${palette[tone]}`}><Icon size={20} /></span></div></Card> }
+function attendanceRate(session) { const attended = session.present + session.late; const marked = attended + session.absent + session.excused; return { attended, marked, percent: marked ? Math.round((attended / marked) * 100) : null } }
 
-function StatCard({ label, value, icon: Icon, tone = 'neutral', onClick }) {
-  const card = (
-    <Card className={`flex items-center gap-3 ${onClick ? 'transition-colors hover:border-primary-500' : ''}`}>
-      <div className={`shrink-0 rounded-lg p-2.5 ${toneClasses[tone]}`}>
-        <Icon size={20} />
-      </div>
-      <div className="min-w-0">
-        <p className="truncate text-lg font-medium text-ink">{value}</p>
-        <p className="truncate text-xs text-ink-muted">{label}</p>
-      </div>
-    </Card>
-  )
-  if (!onClick) return card
-  return (
-    <button type="button" onClick={onClick} className="block w-full text-left">
-      {card}
-    </button>
-  )
-}
-
-// Dashboard-ku wuxuu isticmaalaa hal wicitaan (GET /dashboard/stats) — backend-ku
-// isagu ayaa xisaabiya wadarta (ma aha frontend-ku isagoo ku shubaya
-// dhammaan ardayda + attendance + fees, sida hore).
 function DashboardPage() {
-  const [stats, setStats] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const { showToast } = useToast()
-  const { user } = useAuth()
+  const { user } = useAuth(); const { settings, academicYears } = useSchoolSettings(); const { showToast } = useToast(); const navigate = useNavigate()
+  const [stats, setStats] = useState(null); const [risk, setRisk] = useState(null); const [riskOpen, setRiskOpen] = useState(false); const [refreshing, setRefreshing] = useState(false)
   const isAdmin = user?.role === 'admin'
-  // Risk-ku wuxuu leeyahay wicitaankiisa gooni ah (admin kaliya) — haddii uu
-  // fashilo, dashboard-ka kale wuu sii shaqeynayaa (box-ku wuxuu muujiyaa "—").
-  const [risk, setRisk] = useState(null)
-  const [riskOpen, setRiskOpen] = useState(false)
+  const load = useCallback(async () => { setRefreshing(true); try { const data = await api.get('/dashboard/stats'); setStats(data); if (isAdmin) api.get('/dashboard/risk-students').then(setRisk).catch(() => {}) } catch (err) { showToast(err.message, 'error') } finally { setRefreshing(false) } }, [isAdmin, showToast])
+  useEffect(() => { load() }, [load])
+  if (!stats) return <div className="py-10 text-center"><p className="text-lg font-medium text-ink">Dashboard-ka waa la soo rarayaa...</p><p className="mt-1 text-sm text-ink-muted">Fadlan sug daqiiqad.</p></div>
 
-  useEffect(() => {
-    if (!isAdmin) return undefined
-    let cancelled = false
-    api
-      .get('/dashboard/risk-students')
-      .then((d) => {
-        if (!cancelled) setRisk(d)
-      })
-      .catch(() => {})
-    return () => {
-      cancelled = true
-    }
-  }, [isAdmin])
+  const before = attendanceRate(stats.attendanceToday.before_break); const after = attendanceRate(stats.attendanceToday.after_break)
+  const fees = stats.feesSummary || {}; const pending = (fees.unpaid || 0) + (fees.partial || 0); const year = academicYears.find((item) => item.status === 'active')?.label || stats.academicYear
+  const chart = [{ label: 'Kahor break', Jooga: stats.attendanceToday.before_break.present, Daahay: stats.attendanceToday.before_break.late, Maqan: stats.attendanceToday.before_break.absent }, { label: 'Kadib break', Jooga: stats.attendanceToday.after_break.present, Daahay: stats.attendanceToday.after_break.late, Maqan: stats.attendanceToday.after_break.absent }]
+  const actions = isAdmin ? [{ label: 'Maamul ardayda', to: '/students', icon: Users }, { label: 'Joogitaanka calaamadee', to: '/attendance', icon: CalendarCheck }, { label: 'Eeg lacagaha', to: '/fees', icon: Wallet }] : [{ label: 'Joogitaanka calaamadee', to: '/attendance', icon: CalendarCheck }, { label: 'Natiijooyinka geli', to: '/exam-results', icon: GraduationCap }, { label: 'Cashar post-garee', to: '/assignments', icon: BookOpen }]
 
-  useEffect(() => {
-    let cancelled = false
-    api
-      .get('/dashboard/stats')
-      .then((d) => {
-        if (!cancelled) setStats(d)
-      })
-      .catch((err) => {
-        if (!cancelled) showToast(err.message, 'error')
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false)
-      })
-    return () => {
-      cancelled = true
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  if (loading || !stats) {
-    return (
-      <div>
-        <h1 className="mb-4 text-xl font-medium text-ink">Dashboard</h1>
-        <p className="text-sm text-ink-muted">Waa la soo rarayaa...</p>
-      </div>
-    )
-  }
-
-  const beforeBreak = stats.attendanceToday.before_break
-  const afterBreak = stats.attendanceToday.after_break
-  const totalPresent = beforeBreak.present + afterBreak.present
-  const totalMarked =
-    beforeBreak.present + beforeBreak.absent + beforeBreak.late + beforeBreak.excused +
-    afterBreak.present + afterBreak.absent + afterBreak.late + afterBreak.excused
-  const presentRate = totalMarked > 0 ? totalPresent / totalMarked : null
-
-  const { unpaid = 0, partial = 0 } = stats.feesSummary ?? {}
-  const totalFeeStudents = (stats.feesSummary?.paid ?? 0) + partial + unpaid
-  const unpaidRate = totalFeeStudents > 0 ? (unpaid + partial) / totalFeeStudents : 0
-  const feesTone = unpaidRate === 0 ? 'primary' : unpaidRate <= 0.3 ? 'warning' : 'danger'
-
-  const monthName = new Date(stats.month + '-01').toLocaleDateString('en-US', { month: 'long' })
-
-  // % joogitaanka — session kasta GOONI (Kahor Break / Kadib Break), ma aha
-  // isku-darsan: arday subaxdii yimid laakiin galabtii maqan wuxuu kordhiyaa
-  // kahor-break kaliya. joogo = present + late; tirada guud = dhammaan
-  // la calaamadiyay (oo ay ku jiraan absent iyo excused).
-  function sessionRate(session) {
-    const attended = session.present + session.late
-    const marked = attended + session.absent + session.excused
-    return { attended, marked, percent: marked > 0 ? Math.round((attended / marked) * 100) : null }
-  }
-  const rateTone = (p) => (p === null ? 'neutral' : p >= 90 ? 'primary' : p >= 75 ? 'warning' : 'danger')
-  const beforeRate = sessionRate(beforeBreak)
-  const afterRate = sessionRate(afterBreak)
-  const rateLabel = (title, r) =>
-    r.percent === null ? `${title} (weli lama calaamadin)` : `${title} (${r.attended}/${r.marked} arday)`
-
-  const riskCount = risk?.total ?? null
-  const riskTone =
-    riskCount === null ? 'neutral' : riskCount === 0 ? 'primary' : risk.highCount > 0 ? 'danger' : 'warning'
-
-  // Kahor Break iyo Kadib Break — labadaba si gooni ah ayey isu taagayaan
-  // chart-ka, ma aha isku darsan (arday hal session ka qeyb-galay uma
-  // baahna inuu ku jiro tirada session-ka kale).
-  const chartData = [
-    {
-      session: 'Kahor Break',
-      Present: beforeBreak.present,
-      Absent: beforeBreak.absent,
-      Late: beforeBreak.late,
-    },
-    {
-      session: 'Kadib Break',
-      Present: afterBreak.present,
-      Absent: afterBreak.absent,
-      Late: afterBreak.late,
-    },
-  ]
-
-  return (
-    <div>
-      <h1 className="mb-4 text-xl font-medium text-ink">Dashboard</h1>
-
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label="Ardayda guud" value={stats.totalStudents} icon={Users} />
-        <StatCard label="Macallimiinta" value={stats.totalTeachers} icon={GraduationCap} />
-        <StatCard label="Lacag aan la bixin (bishan)" value={unpaid + partial} icon={Wallet} tone={feesTone} />
-        <StatCard
-          label={`La ururiyay — ${monthName}`}
-          value={`$${stats.totalCollectedThisMonth}`}
-          icon={Wallet}
-          tone="primary"
-        />
-        <StatCard
-          label={rateLabel('Joogitaanka Kahor Break', beforeRate)}
-          value={beforeRate.percent === null ? '—' : `${beforeRate.percent}%`}
-          icon={Sun}
-          tone={rateTone(beforeRate.percent)}
-        />
-        <StatCard
-          label={rateLabel('Joogitaanka Kadib Break', afterRate)}
-          value={afterRate.percent === null ? '—' : `${afterRate.percent}%`}
-          icon={Sunset}
-          tone={rateTone(afterRate.percent)}
-        />
-        {isAdmin && (
-          <StatCard
-            label={riskCount === null ? 'Ardayda khatarta ah' : 'Ardayda khatarta ah — guji'}
-            value={riskCount === null ? '—' : riskCount}
-            icon={ShieldAlert}
-            tone={riskTone}
-            onClick={riskCount === null ? undefined : () => setRiskOpen(true)}
-          />
-        )}
-      </div>
-      {isAdmin && <RiskStudentsModal open={riskOpen} onClose={() => setRiskOpen(false)} data={risk} />}
-
-      <Card className="mt-4 overflow-hidden">
-        <p className="mb-4 truncate text-sm font-medium text-ink">
-          Attendance maanta — Kahor Break iyo Kadib Break (
-          {totalMarked > 0 ? `${Math.round(presentRate * 100)}% present` : 'weli lama calaamadin'})
-        </p>
-        <ResponsiveContainer width="100%" height={240}>
-          <BarChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-            <XAxis dataKey="session" stroke="var(--color-ink-muted)" fontSize={12} />
-            <YAxis
-              stroke="var(--color-ink-muted)"
-              fontSize={12}
-              allowDecimals={false}
-              width={36}
-              tickFormatter={(v) => (v >= 1000 ? `${Math.round(v / 1000)}k` : v)}
-            />
-            <Tooltip
-              contentStyle={{
-                background: 'var(--color-surface)',
-                border: '1px solid var(--color-border)',
-                borderRadius: 8,
-              }}
-            />
-            <Legend wrapperStyle={{ fontSize: 12 }} />
-            <Bar dataKey="Present" fill="var(--color-primary-500)" radius={[6, 6, 0, 0]} />
-            <Bar dataKey="Absent" fill="var(--color-danger-500)" radius={[6, 6, 0, 0]} />
-            <Bar dataKey="Late" fill="var(--color-warning-500)" radius={[6, 6, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
-      </Card>
-    </div>
-  )
+  return <div className="space-y-5"><section className="relative overflow-hidden rounded-3xl bg-linear-to-br from-primary-600 to-brand-dark p-5 text-white shadow-sm sm:p-7"><div className="pointer-events-none absolute -right-12 -top-14 h-48 w-48 rounded-full bg-white/10"/><div className="pointer-events-none absolute -bottom-20 left-1/3 h-40 w-40 rounded-full bg-white/5"/><div className="relative flex flex-wrap items-start justify-between gap-4"><div><p className="text-sm text-white/75">Ku soo dhawoow, {user?.name}</p><h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">{settings.name || 'Dashboard-ka iskuulka'}</h1><p className="mt-2 text-sm text-white/75">{year ? `Sanad dugsiyeedka ${year}` : 'La soco xaaladda iskuulka maanta.'}</p></div><Button variant="secondary" size="sm" onClick={load} disabled={refreshing} className="bg-white/15 text-white hover:bg-white/25"><RefreshCw size={16} className={refreshing ? 'animate-spin' : ''}/>Cusboonaysii</Button></div><div className="relative mt-6 grid grid-cols-3 gap-2 sm:max-w-xl sm:gap-3"><div className="rounded-xl bg-white/12 p-3"><p className="text-xl font-semibold">{stats.totalStudents}</p><p className="text-xs text-white/75">Arday</p></div><div className="rounded-xl bg-white/12 p-3"><p className="text-xl font-semibold">{stats.totalTeachers}</p><p className="text-xs text-white/75">Macallimiin</p></div><div className="rounded-xl bg-white/12 p-3"><p className="text-xl font-semibold">{before.percent === null ? '—' : `${before.percent}%`}</p><p className="text-xs text-white/75">Joogitaanka</p></div></div></section>
+    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4"><Metric icon={Users} label="Ardayda guud" value={stats.totalStudents} note="Diiwaangashan"/><Metric icon={GraduationCap} label="Macallimiinta" value={stats.totalTeachers} note="Firfircoon"/><Metric icon={Wallet} label="La ururiyey bishan" value={`$${stats.totalCollectedThisMonth}`} note={isAdmin ? `${pending} sugaya` : 'Xogta maaliyadda'} tone={pending ? 'warning' : 'primary'}/><Metric icon={AlertTriangle} label="Arday u baahan feejignaan" value={isAdmin ? risk?.total ?? '—' : `${before.marked + after.marked}`} note={isAdmin ? 'Guji si aad u aragto' : 'Joogitaan la calaamadeeyey'} tone={isAdmin && risk?.highCount ? 'danger' : 'warning'}/></div>
+    <div className="grid gap-5 xl:grid-cols-5"><Card className="xl:col-span-3"><div className="mb-4 flex items-center justify-between"><div><h2 className="font-medium text-ink">Joogitaanka maanta</h2><p className="text-xs text-ink-muted">Kahor iyo kadib break</p></div><CalendarCheck size={19} className="text-primary-600"/></div><ResponsiveContainer width="100%" height={250}><BarChart data={chart}><CartesianGrid vertical={false} stroke="var(--color-border)"/><XAxis dataKey="label" tick={{ fill: 'var(--color-ink-muted)', fontSize: 12 }} axisLine={false} tickLine={false}/><YAxis allowDecimals={false} tick={{ fill: 'var(--color-ink-muted)', fontSize: 12 }} axisLine={false} tickLine={false}/><Tooltip contentStyle={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 12 }}/><Bar dataKey="Jooga" stackId="a" fill="var(--color-primary-500)" radius={[0, 0, 0, 0]}/><Bar dataKey="Daahay" stackId="a" fill="var(--color-warning-500)"/><Bar dataKey="Maqan" stackId="a" fill="var(--color-danger-500)" radius={[6, 6, 0, 0]}/></BarChart></ResponsiveContainer></Card><div className="grid gap-3 sm:grid-cols-2 xl:col-span-2 xl:grid-cols-1"><Card className="p-5"><div className="flex items-center gap-3"><span className="rounded-xl bg-primary-50 p-2.5 text-primary-600"><Sun size={19}/></span><div><p className="text-sm font-medium text-ink">Kahor break</p><p className="text-xs text-ink-muted">{before.marked ? `${before.attended}/${before.marked} arday` : 'Weli lama calaamadin'}</p></div><b className="ml-auto text-xl text-ink">{before.percent === null ? '—' : `${before.percent}%`}</b></div></Card><Card className="p-5"><div className="flex items-center gap-3"><span className="rounded-xl bg-warning-50 p-2.5 text-warning-500"><Sunset size={19}/></span><div><p className="text-sm font-medium text-ink">Kadib break</p><p className="text-xs text-ink-muted">{after.marked ? `${after.attended}/${after.marked} arday` : 'Weli lama calaamadin'}</p></div><b className="ml-auto text-xl text-ink">{after.percent === null ? '—' : `${after.percent}%`}</b></div></Card></div></div>
+    <Card><div className="mb-3 flex items-center justify-between"><div><h2 className="font-medium text-ink">Hawlaha degdegga ah</h2><p className="text-xs text-ink-muted">Tag meesha aad hadda u baahan tahay.</p></div></div><div className="grid gap-2 sm:grid-cols-3">{actions.map((action) => { const Icon = action.icon; return <button key={action.to} type="button" onClick={() => navigate(action.to)} className="flex min-h-12 items-center gap-3 rounded-xl border border-border p-3 text-left text-sm font-medium text-ink transition-colors hover:border-primary-500 hover:bg-primary-50"><Icon size={18} className="text-primary-600"/><span className="flex-1">{action.label}</span><ArrowRight size={16} className="text-ink-muted"/></button> })}</div></Card>
+    {isAdmin && <button type="button" onClick={() => setRiskOpen(true)} className="sr-only">Ardayda khatarta ah</button>}{isAdmin && <RiskStudentsModal open={riskOpen} onClose={() => setRiskOpen(false)} data={risk}/>}</div>
 }
-
 export default DashboardPage

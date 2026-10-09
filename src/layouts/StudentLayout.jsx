@@ -1,54 +1,47 @@
 import { Outlet, useNavigate, NavLink } from 'react-router-dom'
-import { LogOut, FileText, Megaphone, DoorOpen, BookOpen } from 'lucide-react'
+import { BookOpen, DoorOpen, FileText, LogOut, Megaphone, Menu, X } from 'lucide-react'
+import { useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import ThemeToggle from '@/components/ThemeToggle'
 import SchoolLogo from '@/components/SchoolLogo'
 import { Button } from '@/components/ui'
 
+const links = [
+  { to: '/my-results', label: 'Natiijadayda', icon: FileText },
+  { to: '/my-assignments', label: 'Casharro & Assignments', icon: BookOpen },
+  { to: '/my-announcements', label: 'Ogeysiisyo', icon: Megaphone },
+  { to: '/my-room', label: 'Qolka Imtixaanka', icon: DoorOpen },
+]
+
 function StudentLayout() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const [menuOpen, setMenuOpen] = useState(false)
+  const tabClass = ({ isActive }) => `flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${isActive ? 'bg-primary-50 text-primary-600' : 'text-ink-muted hover:bg-canvas hover:text-ink'}`
 
   function handleLogout() {
     logout()
     navigate('/login')
   }
 
-  const tabClass = ({ isActive }) =>
-    `flex items-center gap-1.5 border-b-2 px-1 py-2 text-sm font-medium ${
-      isActive ? 'border-primary-500 text-primary-600' : 'border-transparent text-ink-muted'
-    }`
-
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-canvas">
-      <header className="no-print flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-border bg-surface px-4 py-3 sm:px-6">
-        <SchoolLogo />
-        <div className="flex items-center gap-2 sm:gap-4">
-          <ThemeToggle />
-          <p className="hidden text-sm text-ink-muted sm:block">{user?.name}</p>
-          <Button variant="secondary" size="sm" onClick={handleLogout}>
-            <LogOut size={16} />
-            <span className="hidden sm:inline">Ka bax</span>
-          </Button>
+    <div className="min-h-screen bg-canvas">
+      <header className="no-print sticky top-0 z-30 border-b border-border bg-surface/95 px-4 py-3 backdrop-blur sm:px-6">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-2">
+            <button type="button" onClick={() => setMenuOpen((open) => !open)} className="rounded-lg p-2 text-ink hover:bg-canvas md:hidden" aria-label={menuOpen ? 'Xir menu-ga' : 'Fur menu-ga'}>{menuOpen ? <X size={21} /> : <Menu size={21} />}</button>
+            <SchoolLogo />
+          </div>
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+            <p className="hidden max-w-40 truncate text-sm text-ink-muted sm:block">{user?.name}</p>
+            <ThemeToggle />
+            <Button variant="secondary" size="sm" onClick={handleLogout}><LogOut size={16} /><span className="hidden sm:inline">Ka bax</span></Button>
+          </div>
         </div>
+        {menuOpen && <div className="mx-auto mt-3 max-w-7xl border-t border-border pt-3 md:hidden"><nav className="grid gap-1"><p className="px-3 pb-1 text-xs font-medium uppercase tracking-wide text-ink-muted">Student menu</p>{links.map((link) => { const Icon = link.icon; return <NavLink key={link.to} to={link.to} onClick={() => setMenuOpen(false)} className={tabClass}><Icon size={17} />{link.label}</NavLink> })}</nav></div>}
       </header>
-      <nav className="no-print flex shrink-0 gap-4 overflow-x-auto border-b border-border bg-surface px-4 sm:px-6">
-        <NavLink to="/my-results" className={tabClass}>
-          <FileText size={16} /> <span className="whitespace-nowrap">Natiijadayda</span>
-        </NavLink>
-        <NavLink to="/my-assignments" className={tabClass}>
-          <BookOpen size={16} /> <span className="whitespace-nowrap">Assignments & Lessons</span>
-        </NavLink>
-        <NavLink to="/my-announcements" className={tabClass}>
-          <Megaphone size={16} /> <span className="whitespace-nowrap">Announcements</span>
-        </NavLink>
-        <NavLink to="/my-room" className={tabClass}>
-          <DoorOpen size={16} /> <span className="whitespace-nowrap">Qolka Imtixaanka</span>
-        </NavLink>
-      </nav>
-      <main className="flex-1 overflow-y-auto p-4 sm:p-6">
-        <Outlet />
-      </main>
+      <nav className="no-print mx-auto hidden max-w-7xl gap-1 px-4 py-3 md:flex sm:px-6" aria-label="Student navigation">{links.map((link) => { const Icon = link.icon; return <NavLink key={link.to} to={link.to} className={tabClass}><Icon size={16} />{link.label}</NavLink> })}</nav>
+      <main className="mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 sm:py-7"><Outlet /></main>
     </div>
   )
 }

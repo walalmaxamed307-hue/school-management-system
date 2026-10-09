@@ -1,7 +1,8 @@
-import { createContext, useMemo } from 'react'
+import { createContext, useEffect, useMemo } from 'react'
 import { api } from '@/lib/api'
 import { useStaffResource } from '@/lib/useStaffResource'
 import { useToast } from '@/hooks/useToast'
+import { useAuth } from '@/hooks/useAuth'
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const SchoolSettingsContext = createContext(null)
@@ -32,6 +33,14 @@ async function loadSettings() {
 export function SchoolSettingsProvider({ children }) {
   const { data, loading, reload, run } = useStaffResource(loadSettings, INITIAL)
   const { showToast } = useToast()
+  const { user } = useAuth()
+
+  // useStaffResource wuxuu ilaaliyaa contexts-ka kale ee staff-only ah. Halkan
+  // oo keliya student-ka ayaan dib ugu soo qaadannaa school settings-ka, si
+  // logo-ga iyo magaca iskuulkiisa uu portal-ka uga muuqdo.
+  useEffect(() => {
+    if (user?.role === 'student') reload()
+  }, [user?.id, user?.role, reload])
 
   // Sanadka HADDA socda = kan status: 'active' ah. startYear/endYear
   // waxay ka yimaadaan halkaas (settings.startYear ayaa ah key-ga natiijooyinka).
