@@ -4,11 +4,10 @@
 // abuuri lahaa haddii kale).
 export function getHomeRoute(role) {
   if (role === 'student') return '/my-results'
+  if (role === 'owner') return '/owner'
   return '/'
 }
-
-// Bogga Fees: admin, ama macalin loo ogolaaday (fee manager). Backend-ku isagu
-// mar kale ayuu hubiyaa codsi kasta (requireFeeAccess).
 export function hasFeeAccess(user) {
-  return user?.role === 'admin' || (user?.role === 'teacher' && !!user?.isFeeManager)
+  return user?.role === 'admin' ||
+    (user?.role === 'teacher' && user?.isFeeManager === true)
 }

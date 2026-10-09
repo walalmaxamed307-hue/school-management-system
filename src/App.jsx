@@ -35,7 +35,9 @@ import StudentRoomPage from '@/pages/StudentRoomPage'
 import HomeworkPage from '@/pages/HomeworkPage'
 import StudentHomeworkPage from '@/pages/StudentHomeworkPage'
 import LandingPage from './pages/LandingPage'
-
+import OwnerDashboardPage from '@/pages/OwnerDashboardPage'
+import OwnersPage from '@/pages/OwnersPage'
+import OwnerLayout from './layouts/OwnerLayout'
 // Providers-ka xogta (backend + mock ilaa la isku xiro) dhammaantood waa in ay ka sarreeyaan Routes-ka,
 // si xogtu u wadaagto pages-ka oo dhan (Students, Attendance, Fees, Exam
 // results) — ma aha mid kasta oo state gaar ah leh.
@@ -107,6 +109,7 @@ function Shell() {
               <Route path="/students" element={<StudentsPage />} />
               <Route path="/teachers" element={<TeachersPage />} />
               <Route path="/settings" element={<SettingsPage />} />
+               <Route path="/owners" element={<OwnersPage />} />
             </Route>
 
             <Route
@@ -141,6 +144,16 @@ function Shell() {
               <Route path="/my-homework" element={<StudentHomeworkPage />} />
               <Route path="/my-announcements" element={<AnnouncementsPage />} />
               <Route path="/my-room" element={<StudentRoomPage />} />
+            </Route>
+
+            <Route
+              element={
+                <ProtectedRoute allowedRoles={['owner']}>
+                  <OwnerLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route path="/owner" element={<OwnerDashboardPage />} />
             </Route>
 
             <Route path="*" element={<CatchAllRedirect />} />

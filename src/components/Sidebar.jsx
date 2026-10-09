@@ -12,6 +12,7 @@ import {
   DoorOpen,
   Award,
   BookOpen,
+  Crown,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import SchoolLogo from '@/components/SchoolLogo'
@@ -21,6 +22,7 @@ const navItems = [
   { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
   { label: 'Students', path: '/students', icon: Users, adminOnly: true },
   { label: 'Teachers', path: '/teachers', icon: GraduationCap, adminOnly: true },
+  { label: 'Owners', path: '/owners', icon: Crown, adminOnly: true },
   { label: 'Attendance', path: '/attendance', icon: CalendarCheck },
   { label: 'Fees', path: '/fees', icon: Wallet, feeAccess: true },
   { label: 'Exam results', path: '/exam-results', icon: FileText },
