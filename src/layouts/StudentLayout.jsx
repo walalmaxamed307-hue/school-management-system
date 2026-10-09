@@ -36,8 +36,8 @@ function StudentLayout() {
         <NavLink to="/my-results" className={tabClass}>
           <FileText size={16} /> <span className="whitespace-nowrap">Natiijadayda</span>
         </NavLink>
-        <NavLink to="/my-homework" className={tabClass}>
-          <BookOpen size={16} /> <span className="whitespace-nowrap">Assignments</span>
+        <NavLink to="/my-assignments" className={tabClass}>
+          <BookOpen size={16} /> <span className="whitespace-nowrap">Assignments & Lessons</span>
         </NavLink>
         <NavLink to="/my-announcements" className={tabClass}>
           <Megaphone size={16} /> <span className="whitespace-nowrap">Announcements</span>

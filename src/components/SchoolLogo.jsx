@@ -9,8 +9,8 @@ function SchoolLogo({ compact = false }) {
   return (
     <div className="flex min-w-0 items-center gap-2.5">
       <img
-        src={brandMark}
-        alt="IskuulCaawiye"
+        src={settings.logoUrl || brandMark}
+        alt={settings.name || 'IskuulCaawiye'}
         className="h-9 w-9 shrink-0 rounded-lg object-contain"
       />
       {!compact && (

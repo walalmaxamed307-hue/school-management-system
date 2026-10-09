@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { GraduationCap, CalendarDays } from 'lucide-react'
+import { GraduationCap, CalendarDays, ImagePlus, Trash2 } from 'lucide-react'
+import { api } from '@/lib/api'
 import { useSchoolSettings } from '@/hooks/useSchoolSettings'
 import { useToast } from '@/hooks/useToast'
 import { Card, Input, Button } from '@/components/ui'
@@ -30,6 +31,7 @@ function SettingsPage() {
   const [creatingYear, setCreatingYear] = useState(false)
   const [preparingNextYear, setPreparingNextYear] = useState(false)
   const [promoting, setPromoting] = useState(false)
+  const [logoBusy, setLogoBusy] = useState(false)
 
   // Marka xogta backend-ka la soo qaado (ama la keydiyo), foomka waa la dhiibayaa.
   useEffect(() => {
@@ -104,6 +106,28 @@ function SettingsPage() {
     )
   }
 
+  async function uploadLogo(file) {
+    if (!file) return
+    setLogoBusy(true)
+    try {
+      const body = new FormData()
+      body.append('file', file)
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/school-settings/logo`, {
+        method: 'POST', headers: { Authorization: `Bearer ${localStorage.getItem('auth_token')}` }, body,
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Logo upload failed')
+      showToast('Logo-ga waa la keydiyay', 'success')
+      window.location.reload()
+    } catch (err) { showToast(err.message, 'error') } finally { setLogoBusy(false) }
+  }
+
+  async function removeLogo() {
+    setLogoBusy(true)
+    try { await api.delete('/school-settings/logo'); showToast('Logo-ga waa la saaray', 'success'); window.location.reload() }
+    catch (err) { showToast(err.message, 'error') } finally { setLogoBusy(false) }
+  }
+
   return (
     <div>
       <h1 className="mb-4 text-xl font-medium text-ink">Settings</h1>
@@ -112,6 +136,15 @@ function SettingsPage() {
         <Card>
           <h2 className="mb-4 text-sm font-medium text-ink">Macluumaadka iskuulka</h2>
           <form onSubmit={handleSave} className="flex flex-col gap-4">
+            <div className="rounded-lg border border-border p-3">
+              <p className="mb-2 text-sm font-medium text-ink">Logo-ga iskuulka</p>
+              {settings.logoUrl && <img src={settings.logoUrl} alt="School logo" className="mb-2 h-16 w-16 rounded object-contain" />}
+              <div className="flex flex-wrap gap-2">
+                <label className="cursor-pointer rounded-lg border border-border px-3 py-2 text-sm text-ink"><ImagePlus className="mr-1 inline" size={15} />{logoBusy ? '...' : 'Dooro logo'}<input className="hidden" type="file" accept=".png,.jpg,.jpeg" disabled={logoBusy} onChange={(e) => uploadLogo(e.target.files?.[0])} /></label>
+                {settings.logoUrl && <Button type="button" variant="ghost" disabled={logoBusy} onClick={removeLogo}><Trash2 size={15} /> Ka saar</Button>}
+              </div>
+              <p className="mt-2 text-xs text-ink-muted">PNG/JPG oo ugu badnaan 2 MB.</p>
+            </div>
             <Input
               label="Magaca iskuulka"
               value={form.name}

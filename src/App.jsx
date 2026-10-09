@@ -33,6 +33,7 @@ import RoomsPage from '@/pages/RoomsPage'
 import GraduatesPage from '@/pages/GraduatesPage'
 import StudentRoomPage from '@/pages/StudentRoomPage'
 import HomeworkPage from '@/pages/HomeworkPage'
+import AssignmentsPage from '@/pages/AssignmentsPage'
 import StudentHomeworkPage from '@/pages/StudentHomeworkPage'
 import LandingPage from './pages/LandingPage'
 import OwnerDashboardPage from '@/pages/OwnerDashboardPage'
@@ -120,6 +121,7 @@ function Shell() {
               }
             >
               <Route path="/homework" element={<HomeworkPage />} />
+              <Route path="/assignments" element={<AssignmentsPage />} />
             </Route>
 
             {/* Fees: admin + macalinka fee manager-ka ah */}
@@ -141,6 +143,8 @@ function Shell() {
               }
             >
               <Route path="/my-results" element={<StudentResultsPage />} />
+              <Route path="/my-assignments" element={<StudentHomeworkPage />} />
+              {/* URL-gii hore ha sii shaqeeyo si bookmarks-ka ardayda aysan u jabin. */}
               <Route path="/my-homework" element={<StudentHomeworkPage />} />
               <Route path="/my-announcements" element={<AnnouncementsPage />} />
               <Route path="/my-room" element={<StudentRoomPage />} />

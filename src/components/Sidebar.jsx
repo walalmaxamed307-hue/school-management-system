@@ -26,7 +26,7 @@ const navItems = [
   { label: 'Attendance', path: '/attendance', icon: CalendarCheck },
   { label: 'Fees', path: '/fees', icon: Wallet, feeAccess: true },
   { label: 'Exam results', path: '/exam-results', icon: FileText },
-  { label: 'Assignments', path: '/homework', icon: BookOpen, teacherOnly: true },
+  { label: 'Assignments & Lessons', path: '/assignments', icon: BookOpen, teacherOnly: true },
   { label: 'Announcements', path: '/announcements', icon: Megaphone },
   { label: 'Rooms', path: '/rooms', icon: DoorOpen },
   { label: 'Graduates', path: '/graduates', icon: Award },
