@@ -32,8 +32,8 @@ function StudentLayout() {
             <button type="button" onClick={() => setMenuOpen((open) => !open)} className="rounded-lg p-2 text-ink hover:bg-canvas md:hidden" aria-label={menuOpen ? 'Xir menu-ga' : 'Fur menu-ga'}>{menuOpen ? <X size={21} /> : <Menu size={21} />}</button>
             <SchoolLogo />
           </div>
-          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-            <p className="hidden max-w-40 truncate text-sm text-ink-muted sm:block">{user?.name}</p>
+          <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+            <p className="max-w-24 truncate text-sm font-medium text-ink sm:max-w-40 sm:text-ink-muted">{user?.name}</p>
             <ThemeToggle />
             <Button variant="secondary" size="sm" onClick={handleLogout}><LogOut size={16} /><span className="hidden sm:inline">Ka bax</span></Button>
           </div>
