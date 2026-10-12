@@ -1,161 +1,29 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Navigate, useNavigate } from 'react-router-dom'
+import { GraduationCap, Headphones, LockKeyhole, Sparkles } from 'lucide-react'
 import brandMark from '@/assets/brand-mark.png'
 import { useAuth } from '@/hooks/useAuth'
-
 import WhatsAppButton from '@/components/WhatsAppButton'
 import ThemeToggle from '@/components/ThemeToggle'
-import { Button, Input, Card } from '@/components/ui'
+import { Button, Input } from '@/components/ui'
 
 function StaffLoginForm() {
-  const [authError, setAuthError] = useState('')
-  const { login } = useAuth()
-  const navigate = useNavigate()
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm()
-
-  async function onSubmit(values) {
-    setAuthError('')
-    const result = await login(values.email, values.password)
-    if (result.success) {
-      navigate('/dashboard')
-      return
-    }
-    setAuthError(result.error)
-  }
-
-  return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-      <Input
-        label="Email"
-        type="email"
-        placeholder="admin@iskuul.so"
-        error={errors.email?.message}
-        {...register('email', { required: 'Email waa loo baahan yahay' })}
-      />
-      <Input
-        label="Password"
-        type="password"
-        error={errors.password?.message}
-        {...register('password', { required: 'Password waa loo baahan yahay' })}
-      />
-      {authError && <p className="text-sm text-danger-500">{authError}</p>}
-      <Button type="submit" className="w-full" disabled={isSubmitting}>
-        {isSubmitting ? 'Waa la galayaa...' : 'Gal'}
-      </Button>
-    </form>
-  )
+  const [authError, setAuthError] = useState(''); const { login } = useAuth(); const navigate = useNavigate(); const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm()
+  async function onSubmit(values) { setAuthError(''); const result = await login(values.email, values.password); if (result.success) return navigate('/dashboard'); setAuthError(result.error) }
+  return <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4"><Input label="Email" type="email" placeholder="admin@iskuul.so" error={errors.email?.message} {...register('email', { required: 'Email waa loo baahan yahay' })}/><Input label="Password" type="password" error={errors.password?.message} {...register('password', { required: 'Password waa loo baahan yahay' })}/>{authError && <p className="rounded-xl bg-danger-50 px-3 py-2 text-sm text-danger-500">{authError}</p>}<Button type="submit" className="min-h-12 w-full" disabled={isSubmitting}>{isSubmitting ? 'Waa la galayaa...' : 'Gal systemka'}</Button></form>
 }
 
 function StudentLoginForm() {
-  const [authError, setAuthError] = useState('')
-  const { loginAsStudent } = useAuth()
-  const navigate = useNavigate()
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm()
-
-  async function onSubmit(values) {
-    setAuthError('')
-    const result = await loginAsStudent(values.studentId, values.dob)
-    if (result.success) {
-      navigate('/my-results')
-      return
-    }
-    setAuthError(result.error)
-  }
-
-  return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-      <Input
-        label="Student ID"
-        placeholder="STU-000123"
-        error={errors.studentId?.message}
-        {...register('studentId', { required: 'Student ID waa loo baahan yahay' })}
-      />
-      <Input
-        label="Taariikhda dhalashada"
-        type="date"
-        error={errors.dob?.message}
-        {...register('dob', { required: 'Taariikhda dhalashada waa loo baahan yahay' })}
-      />
-      {authError && <p className="text-sm text-danger-500">{authError}</p>}
-      <Button type="submit" className="w-full" disabled={isSubmitting}>
-        {isSubmitting ? 'Waa la galayaa...' : 'Gal'}
-      </Button>
-    </form>
-  )
+  const [authError, setAuthError] = useState(''); const { loginAsStudent } = useAuth(); const navigate = useNavigate(); const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm()
+  async function onSubmit(values) { setAuthError(''); const result = await loginAsStudent(values.studentId, values.dob); if (result.success) return navigate('/my-results'); setAuthError(result.error) }
+  return <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4"><Input label="Student ID" placeholder="STU-000123" error={errors.studentId?.message} {...register('studentId', { required: 'Student ID waa loo baahan yahay' })}/><Input label="Taariikhda dhalashada" type="date" error={errors.dob?.message} {...register('dob', { required: 'Taariikhda dhalashada waa loo baahan yahay' })}/>{authError && <p className="rounded-xl bg-danger-50 px-3 py-2 text-sm text-danger-500">{authError}</p>}<Button type="submit" className="min-h-12 w-full" disabled={isSubmitting}>{isSubmitting ? 'Waa la galayaa...' : 'Gal student portal'}</Button></form>
 }
 
 function LoginPage() {
-  const [tab, setTab] = useState('staff')
-  const { user } = useAuth()
-
-  if (user) {
-    return (
-      <Navigate
-        to={user.role === 'student' ? '/my-results' : '/dashboard'}
-        replace
-      />
-    )
-  }
-
-
-  return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-canvas px-4 py-10">
-      <Card className="w-full max-w-sm">
-        <div className="mb-6 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-  <img
-    src={brandMark}
-    alt="IskuulCaawiye logo"
-    className="h-11 w-11 rounded-xl object-contain sm:h-10 sm:w-10"
-  />
-  <span className="text-base font-extrabold tracking-tight text-ink sm:text-sm">
-    Iskuul<span className="text-emerald-600">Caawiye</span>
-  </span>
-</div>
-          <ThemeToggle />
-        </div>
-
-        <p className="mb-4 rounded-lg bg-canvas px-3 py-2 text-xs text-ink-muted">
-          Haddii uusan akoon ku lahayn iskuulkaaga, systemka ma geli kartid. Nagala soo xariir
-          chatka hoose si aan akoon iskuulkaaga u sameyno.
-        </p>
-
-        <div className="mb-6 flex rounded-lg border border-border p-1">
-          <button
-            onClick={() => setTab('staff')}
-            className={`flex-1 rounded-md py-2 text-sm font-medium transition-colors sm:py-1.5 ${
-              tab === 'staff' ? 'bg-primary-50 text-primary-600' : 'text-ink-muted'
-            }`}
-          >
-            Admin / Macalin
-          </button>
-          <button
-            onClick={() => setTab('student')}
-            className={`flex-1 rounded-md py-2 text-sm font-medium transition-colors sm:py-1.5 ${
-              tab === 'student' ? 'bg-primary-50 text-primary-600' : 'text-ink-muted'
-            }`}
-          >
-            Arday
-          </button>
-        </div>
-
-        {tab === 'staff' ? <StaffLoginForm /> : <StudentLoginForm />}
-      </Card>
-      <p className="mt-6 text-center text-xs text-ink-muted">
-        Owner / Mohamed Ahmed Ali / Fullstack Developer
-      </p>
-      <WhatsAppButton />
-    </div>
-  )
+  const [tab, setTab] = useState('staff'); const { user } = useAuth()
+  if (user) return <Navigate to={user.role === 'student' ? '/my-results' : '/dashboard'} replace />
+  return <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-canvas px-4 py-10"><div className="pointer-events-none absolute -left-24 top-12 h-64 w-64 rounded-full bg-primary-100/55 blur-3xl"/><div className="pointer-events-none absolute -bottom-24 -right-20 h-72 w-72 rounded-full bg-primary-50 blur-3xl"/><div className="relative w-full max-w-5xl"><div className="grid overflow-hidden rounded-3xl border border-border bg-surface shadow-xl lg:grid-cols-[.92fr_1.08fr]"><aside className="relative hidden overflow-hidden bg-brand p-9 text-white lg:block"><div className="absolute -right-20 -top-16 h-56 w-56 rounded-full bg-white/10"/><div className="relative"><div className="flex items-center gap-3"><img src={brandMark} alt="IskuulCaawiye" className="h-12 w-12 rounded-2xl bg-white/10 object-contain p-1"/><span className="text-lg font-medium">IskuulCaawiye</span></div><div className="mt-16"><span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-xs"><Sparkles size={14}/>School management system</span><h1 className="mt-5 text-4xl font-semibold leading-tight">Maamulka iskuulka, hal meel.</h1><p className="mt-4 text-sm leading-6 text-white/75">Maamul ardayda, macallimiinta, attendance-ka, natiijooyinka, casharrada iyo fees-ka si fudud.</p></div><div className="mt-12 space-y-3 text-sm text-white/80"><p className="flex items-center gap-2"><GraduationCap size={17}/>Admin, Macallin, Arday & Owner</p><p className="flex items-center gap-2"><LockKeyhole size={17}/>Xogta iskuulkaaga waa ammaan</p></div></div></aside><section className="p-5 sm:p-8"><div className="flex items-center justify-between gap-3"><div className="flex items-center gap-2.5 lg:hidden"><img src={brandMark} alt="IskuulCaawiye" className="h-11 w-11 rounded-xl object-contain"/><span className="text-base font-medium text-ink">IskuulCaawiye</span></div><div className="ml-auto"><ThemeToggle /></div></div><div className="mt-8"><p className="text-sm text-ink-muted">Ku soo dhawoow</p><h2 className="mt-1 text-2xl font-semibold tracking-tight text-ink">Gal account-kaaga</h2><p className="mt-2 text-sm leading-6 text-ink-muted">Dooro nooca account-ka, kadib geli xogtaada.</p></div><div className="mt-7 grid grid-cols-2 rounded-xl bg-canvas p-1"><button type="button" onClick={() => setTab('staff')} className={`rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${tab === 'staff' ? 'bg-surface text-primary-600 shadow-sm' : 'text-ink-muted'}`}>Admin / Macalin</button><button type="button" onClick={() => setTab('student')} className={`rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${tab === 'student' ? 'bg-surface text-primary-600 shadow-sm' : 'text-ink-muted'}`}>Arday</button></div><div className="mt-6">{tab === 'staff' ? <StaffLoginForm /> : <StudentLoginForm />}</div><div className="mt-6 flex items-start gap-2 rounded-xl bg-primary-50 px-3 py-3 text-xs leading-5 text-primary-600"><Headphones size={16} className="mt-0.5 shrink-0"/><p>Haddii cillad ku qabsato, nagala soo xiriir chat-ka hoose si aan kuugu xalino.</p></div></section></div><footer className="mt-5 text-center text-xs text-ink-muted">© {new Date().getFullYear()} IskuulCaawiye. All rights reserved. Founder / Developer: Mohamed Ahmed Ali.</footer></div><WhatsAppButton /></div>
 }
 
 export default LoginPage
