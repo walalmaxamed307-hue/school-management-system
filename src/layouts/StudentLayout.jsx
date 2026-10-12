@@ -27,7 +27,7 @@ function StudentLayout() {
   const details = [
     ['Student ID', user?.studentCode || '—'],
     ['Dhalashada', user?.dob || '—'],
-    ['Waalid', user?.parentName || '—'],
+    ['Fasal', [user?.class, user?.section].filter(Boolean).join(' · ') || '—'],
   ]
 
   return (
