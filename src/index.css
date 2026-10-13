@@ -39,6 +39,38 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Login page oo keliya: motion tartiib ah, aan mashquulin, kana shaqeeya
+   desktop iyo mobile. Reduced-motion users wax animation ah ma arkaan. */
+@keyframes login-float-a {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(34px, -24px, 0) scale(1.08); }
+}
+@keyframes login-float-b {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-30px, 22px, 0) scale(.94); }
+}
+@keyframes login-enter {
+  from { opacity: 0; transform: translateY(16px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes login-form-enter {
+  from { opacity: 0; transform: translateX(10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.login-orb-a { animation: login-float-a 12s ease-in-out infinite; }
+.login-orb-b { animation: login-float-b 15s ease-in-out infinite; }
+.login-shell { animation: login-enter .65s cubic-bezier(.2,.8,.2,1) both; }
+.login-form-enter { animation: login-form-enter .3s ease-out both; }
+.login-button { transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease; }
+.login-button:hover { transform: translateY(-2px); box-shadow: 0 12px 24px color-mix(in srgb, var(--color-primary-600) 24%, transparent); }
+.login-button:active { transform: translateY(1px) scale(.985); box-shadow: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .login-orb-a, .login-orb-b, .login-shell, .login-form-enter { animation: none; }
+  .login-button { transition: none; }
+}
+
 /* Dark palette — kaliya CSS vars-ka ayaan bedelnay, component-yada wax kama
    beddelmin (waxay horeba isticmaaleen bg-canvas/text-ink/iwm). */
 .dark {
