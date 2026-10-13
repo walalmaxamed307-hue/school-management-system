@@ -71,6 +71,47 @@ body {
   .login-button { transition: none; }
 }
 
+/* Login glass scene — waxaa lagu scope-gareeyay .login-page si uusan u
+   saameynin pages-ka kale ee system-ka. */
+@keyframes login-bubble-rise {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: .38; }
+  50% { transform: translate3d(26px, -34px, 0) scale(1.12); opacity: .72; }
+}
+@keyframes login-bubble-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(-32px, 24px, 0) rotate(18deg); }
+}
+@keyframes login-glass-shine {
+  0%, 100% { transform: translateX(-130%) skewX(-18deg); opacity: 0; }
+  30%, 55% { opacity: .55; }
+  70% { transform: translateX(290%) skewX(-18deg); opacity: 0; }
+}
+@keyframes login-tab-pop {
+  0% { transform: scale(.96); }
+  65% { transform: scale(1.025); }
+  100% { transform: scale(1); }
+}
+
+.login-page { background: radial-gradient(circle at 12% 10%, color-mix(in srgb, var(--color-primary-100) 70%, transparent), transparent 28%), var(--color-canvas); }
+.login-bubble { animation: login-bubble-rise 9s ease-in-out infinite; }
+.login-bubble-alt { animation: login-bubble-drift 13s ease-in-out infinite; }
+.login-glass { position: relative; overflow: hidden; }
+.login-glass::after { content: ''; pointer-events: none; position: absolute; inset: 0; width: 34%; background: linear-gradient(90deg, transparent, rgba(255,255,255,.3), transparent); animation: login-glass-shine 8s ease-in-out infinite; }
+.login-tab-active { animation: login-tab-pop .32s cubic-bezier(.2,.9,.25,1.2) both; }
+.login-field { transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease, background-color .2s ease; }
+.login-field:focus-within { transform: translateY(-2px); }
+.login-field input:focus { outline: none; }
+
+.dark .login-page { background: radial-gradient(circle at 15% 8%, rgba(52,211,153,.16), transparent 29%), radial-gradient(circle at 88% 90%, rgba(15,110,86,.28), transparent 34%), #071510; }
+.dark .login-glass { border-color: rgba(167,243,208,.18); background: linear-gradient(135deg, rgba(13,54,42,.68), rgba(7,29,22,.82)); box-shadow: 0 28px 88px rgba(0,0,0,.42), inset 0 1px 0 rgba(209,250,229,.13); backdrop-filter: blur(20px); }
+.dark .login-panel { background: rgba(255,255,255,.045); border-color: rgba(209,250,229,.1); }
+.dark .login-field { border-color: rgba(167,243,208,.16); background: rgba(2,20,14,.5); }
+.dark .login-field:focus-within { border-color: rgba(52,211,153,.75); box-shadow: 0 0 0 4px rgba(16,185,129,.13), 0 10px 32px rgba(0,0,0,.24); }
+
+@media (prefers-reduced-motion: reduce) {
+  .login-bubble, .login-bubble-alt, .login-glass::after, .login-tab-active { animation: none; }
+}
+
 /* Dark palette — kaliya CSS vars-ka ayaan bedelnay, component-yada wax kama
    beddelmin (waxay horeba isticmaaleen bg-canvas/text-ink/iwm). */
 .dark {
