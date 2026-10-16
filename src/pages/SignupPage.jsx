@@ -11,11 +11,11 @@ const plans = [
   { id: '701+', range: '701+ arday', price: 'Qiime gaar ah', detail: 'Waxaan kuu soo diri doonnaa qiime ku habboon iskuulkaaga.' },
 ]
 
-const inputClass = 'w-full rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 dark:border-white/10 dark:bg-white/[0.06] dark:text-white dark:placeholder:text-slate-500'
+const inputClass = 'block w-full min-w-0 max-w-full rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 dark:border-white/10 dark:bg-white/[0.06] dark:text-white dark:placeholder:text-slate-500'
 
 function Field({ icon: Icon, label, children }) {
   return (
-    <label className="block">
+    <label className="block min-w-0">
       <span className="mb-2 flex items-center gap-2 text-sm font-bold text-slate-700 dark:text-slate-200">
         <Icon size={16} className="text-emerald-600" />
         {label}
@@ -66,11 +66,11 @@ function SignupPage() {
   }
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-slate-50 px-4 py-5 text-slate-900 sm:px-6 sm:py-8 dark:bg-[#07111b] dark:text-slate-100">
+    <main className="relative isolate min-h-screen overflow-x-clip bg-slate-50 px-4 py-5 text-slate-900 sm:px-6 sm:py-8 dark:bg-[#07111b] dark:text-slate-100">
       <div className="pointer-events-none absolute left-[-7rem] top-20 h-72 w-72 rounded-full bg-emerald-400/20 blur-3xl" />
       <div className="pointer-events-none absolute right-[-6rem] top-1/3 h-80 w-80 rounded-full bg-blue-500/15 blur-3xl" />
 
-      <div className="relative mx-auto max-w-5xl">
+      <div className="relative mx-auto min-w-0 max-w-5xl">
         <header className="mb-8 flex items-center justify-between sm:mb-12">
           <Link to="/" className="flex items-center gap-2.5" aria-label="Ku noqo bogga hore">
             <img src={brandMark} alt="IskuulCaawiye" className="h-11 w-11 rounded-xl object-contain" />
@@ -97,8 +97,8 @@ function SignupPage() {
             </Link>
           </section>
         ) : (
-          <div className="grid overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-2xl shadow-slate-950/10 lg:grid-cols-[.82fr_1.18fr] dark:border-white/10 dark:bg-[#0c1a28]">
-            <aside className="bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 p-7 text-white sm:p-10">
+          <div className="grid min-w-0 overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-2xl shadow-slate-950/10 lg:grid-cols-[.82fr_1.18fr] dark:border-white/10 dark:bg-[#0c1a28]">
+            <aside className="min-w-0 bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 p-7 text-white sm:p-10">
               <div className="inline-flex rounded-2xl bg-white/10 p-3 text-emerald-300"><ClipboardCheck size={25} /></div>
               <p className="mt-7 text-xs font-black uppercase tracking-[0.18em] text-emerald-300">School application</p>
               <h1 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Ku biir IskuulCaawiye.</h1>
@@ -113,7 +113,7 @@ function SignupPage() {
               <div className="mt-10 rounded-2xl border border-white/10 bg-white/[0.07] p-4 text-sm leading-6 text-slate-300"><ShieldCheck size={18} className="mb-2 text-emerald-300" />Password laguma weydiinayo boggan. Account-kaaga iyo password-kaaga waxaa loo diyaarinayaa si ammaan ah marka codsiga la ansixiyo.</div>
             </aside>
 
-            <section className="p-6 sm:p-10">
+            <section className="min-w-0 p-6 sm:p-10">
               <div className="mb-8"><p className="text-sm font-bold text-emerald-600">Bilow codsigaaga</p><h2 className="mt-1 text-2xl font-black tracking-tight text-slate-950 dark:text-white">Xogta iskuulka</h2><p className="mt-2 text-sm leading-6 text-slate-500 dark:text-slate-400">Dhammaan meelaha calaamadda leh waa muhiim.</p></div>
               <form onSubmit={submitApplication} className="space-y-5">
                 <div className="grid gap-5 sm:grid-cols-2">
