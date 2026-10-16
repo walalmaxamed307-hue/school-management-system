@@ -33,6 +33,7 @@ function SignupPage() {
 
   const submitApplication = async (event) => {
     event.preventDefault()
+    const formElement = event.currentTarget
     const endpoint = import.meta.env.VITE_FORMSPREE_ENDPOINT
 
     if (!endpoint) {
@@ -42,7 +43,7 @@ function SignupPage() {
 
     setStatus('submitting')
     setError('')
-    const form = new FormData(event.currentTarget)
+    const form = new FormData(formElement)
     form.set('Tirada ardayda', selectedPlan.range)
     form.set('Qiimaha la filayo', `${selectedPlan.price} ${selectedPlan.detail}`)
     form.set('_subject', `Codsi cusub: ${form.get('Magaca iskuulka')}`)
@@ -56,7 +57,7 @@ function SignupPage() {
 
       if (!response.ok) throw new Error('Submission failed')
       setStatus('success')
-      event.currentTarget.reset()
+      formElement.reset()
       setStudentRange(plans[0].id)
     } catch {
       setStatus('idle')
