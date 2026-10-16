@@ -1,8 +1,37 @@
 import { useEffect, useMemo, useState } from 'react'
-import { BookOpen, ClipboardList, Download } from 'lucide-react'
+import { BookOpen, ClipboardList, Download, ExternalLink, PlayCircle } from 'lucide-react'
 import { api } from '@/lib/api'
 import { useToast } from '@/hooks/useToast'
 import { Card } from '@/components/ui'
+
+const LESSON_LINK_PATTERN = /(?:https?:\/\/|www\.)[^\s<]+/gi
+
+function getLessonLinks(text = '') {
+  const matches = text.match(LESSON_LINK_PATTERN) ?? []
+  return [...new Set(matches.map((url) => url.replace(/[),.!?]+$/, '')))]
+    .map((url) => ({ label: url, href: url.startsWith('www.') ? `https://${url}` : url }))
+    .filter(({ href }) => {
+      try {
+        const protocol = new URL(href).protocol
+        return protocol === 'https:' || protocol === 'http:'
+      } catch {
+        return false
+      }
+    })
+}
+
+function LessonDescription({ text }) {
+  const parts = text.split(LESSON_LINK_PATTERN)
+  const links = text.match(LESSON_LINK_PATTERN) ?? []
+
+  return <p className="whitespace-pre-wrap break-words text-sm leading-6 text-ink">
+    {parts.map((part, index) => {
+      const rawUrl = links[index]
+      const link = rawUrl && getLessonLinks(rawUrl)[0]
+      return <span key={`${part}-${index}`}>{part}{link && <a href={link.href} target="_blank" rel="noopener noreferrer" className="font-semibold text-primary-600 underline decoration-primary-600/35 underline-offset-2 hover:text-primary-700">{link.label}</a>}</span>
+    })}
+  </p>
+}
 
 // Ardayga: casharrada iyo assignments-ka macalimiintiisu u direen.
 // Fasalka/section-ka backend-ku ayaa ka qaadaya enrollment-ka ardayga
@@ -117,8 +146,9 @@ function StudentHomeworkPage() {
         {items && visible.length === 0 && (
           <Card className="text-center text-sm text-ink-muted">Wali assignment lagu siin</Card>
         )}
-        {visible.map((item) => (
-          <Card key={item.id}>
+        {visible.map((item) => {
+          const lessonLinks = section === 'lesson' ? getLessonLinks(item.description) : []
+          return <Card key={item.id}>
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
               <div className="flex flex-wrap items-center gap-2">
               <span className="flex items-center gap-1 rounded-full bg-primary-500 px-2 py-0.5 text-xs text-white">
@@ -139,14 +169,29 @@ function StudentHomeworkPage() {
               )}
             </div>
             <h3 className="mb-1 font-medium text-ink">{item.title}</h3>
-            {item.description && (
-              <p className="whitespace-pre-wrap break-words text-sm text-ink">{item.description}</p>
+            {item.description && <LessonDescription text={item.description} />}
+            {lessonLinks.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {lessonLinks.map((link, index) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-xl bg-primary-50 px-3 py-2 text-sm font-semibold text-primary-600 transition hover:-translate-y-0.5 hover:bg-primary-100 hover:text-primary-700"
+                  >
+                    {index === 0 ? <PlayCircle size={17} /> : <ExternalLink size={17} />}
+                    Fur casharka link-ga
+                    <ExternalLink size={14} />
+                  </a>
+                ))}
+              </div>
             )}
             {item.dueDate && section !== 'lesson' && (
               <p className="mt-2 text-xs text-ink-muted">Taariikhda kama dambaysta ah: {item.dueDate}</p>
             )}
           </Card>
-        ))}
+        })}
       </div>
     </div>
   )
