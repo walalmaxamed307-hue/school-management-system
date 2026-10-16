@@ -12,6 +12,7 @@ import StudentForm from '@/features/students/StudentForm'
 import ManageClassesModal from '@/features/students/ManageClassesModal'
 import BulkAssignSectionModal from '@/features/students/BulkAssignSectionModal'
 import PendingTransfersCard from '@/features/students/PendingTransfersCard'
+import StudentInfoModal from '@/components/StudentInfoModal'
 
 const statusStyles = {
   active: 'bg-primary-50 text-primary-600',
@@ -41,6 +42,7 @@ function StudentsPage() {
   const [sectionFilter, setSectionFilter] = useState('all')
   const [modalMode, setModalMode] = useState(null) // null | 'add' | 'edit'
   const [activeStudent, setActiveStudent] = useState(null)
+  const [infoStudent, setInfoStudent] = useState(null)
   const [classesModalOpen, setClassesModalOpen] = useState(false)
   const [bulkModalOpen, setBulkModalOpen] = useState(false)
   const [schools, setSchools] = useState([])
@@ -220,7 +222,21 @@ function StudentsPage() {
         <Table
         columns={[
           { key: 'studentCode', label: 'ID' },
-          { key: 'name', label: 'Magaca' },
+          {
+            key: 'name',
+            label: 'Magaca',
+            render: (row) => (
+              <button
+                type="button"
+                onClick={() => setInfoStudent(row.id)}
+                className="text-left font-medium text-ink transition hover:text-primary-600 hover:underline hover:underline-offset-2"
+                aria-label={`${row.name} xogtiisa arag`}
+              >
+                {row.name}
+              </button>
+            ),
+            sortable: true,
+          },
           { key: 'class', label: 'Fasalka' },
           {
             key: 'section',
@@ -245,6 +261,7 @@ function StudentsPage() {
             render: (row) => (
               <div className="flex gap-2">
                 <button
+                  type="button"
                   onClick={() => openEdit(row)}
                   className="text-ink-muted hover:text-primary-600"
                   aria-label="Wax ka beddel"
@@ -252,6 +269,7 @@ function StudentsPage() {
                   <Pencil size={16} />
                 </button>
                 <button
+                  type="button"
                   onClick={() => handleDelete(row)}
                   className="text-ink-muted hover:text-danger-500"
                   aria-label="Tirtir"
@@ -273,6 +291,7 @@ function StudentsPage() {
         title={modalMode === 'edit' ? 'Wax ka beddel ardayga' : 'Ku dar arday cusub'}
       >
         <StudentForm
+          key={activeStudent?.id ?? 'new-student'}
           defaultValues={activeStudent}
           classes={classes}
           schools={schools}
@@ -281,6 +300,11 @@ function StudentsPage() {
           onTransfer={modalMode === 'edit' ? handleTransfer : undefined}
         />
       </Modal>
+
+      <StudentInfoModal
+        studentId={infoStudent}
+        onClose={() => setInfoStudent(null)}
+      />
 
       <ManageClassesModal
         open={classesModalOpen}
