@@ -119,8 +119,9 @@ body {
 .app-header { box-shadow: 0 3px 14px rgba(15, 23, 42, .025); }
 .app-search { transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease; }
 .app-search:focus { border-color: var(--color-primary-500); background: var(--color-surface); box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary-100) 48%, transparent); }
-.app-content > * { animation: app-page-enter .32s ease-out both; }
-@keyframes app-page-enter { from { opacity: .65; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+/* Page animation lama saaro wrapper-ka content-ka: animation-ku wuxuu samayn
+   karaa stacking layer desktop-ka, taas oo header-ka ka dhigi karta inuu dul
+   maro modal dheer (sida Student edit/info). */
 .dark .app-sidebar { box-shadow: 12px 0 36px rgba(0, 0, 0, .16); }
 
 /* Public landing page — calm motion and depth, scoped away from the app UI. */
@@ -150,7 +151,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .login-bubble, .login-bubble-alt, .login-glass::after, .login-tab-active, .app-content > *, .landing-orb-one, .landing-orb-two, .landing-reveal, .landing-preview, .landing-chart-bar { animation: none; }
+  .login-bubble, .login-bubble-alt, .login-glass::after, .login-tab-active, .landing-orb-one, .landing-orb-two, .landing-reveal, .landing-preview, .landing-chart-bar { animation: none; }
 }
 
 /* Dark palette — kaliya CSS vars-ka ayaan bedelnay, component-yada wax kama
