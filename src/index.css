@@ -123,6 +123,26 @@ body {
 @keyframes app-page-enter { from { opacity: .65; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
 .dark .app-sidebar { box-shadow: 12px 0 36px rgba(0, 0, 0, .16); }
 
+/* Public landing page — calm motion and depth, scoped away from the app UI. */
+@keyframes landing-float-one { 0%, 100% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(28px, -22px, 0) scale(1.08); } }
+@keyframes landing-float-two { 0%, 100% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(-28px, 26px, 0) scale(.94); } }
+@keyframes landing-reveal { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes landing-bar { from { transform: scaleY(.35); } to { transform: scaleY(1); } }
+.landing-page { background-image: linear-gradient(to bottom, rgba(236,253,245,.38), transparent 42rem); }
+.landing-orb { pointer-events: none; position: absolute; border-radius: 999px; filter: blur(46px); }
+.landing-orb-one { left: -8rem; top: 6rem; height: 22rem; width: 22rem; background: rgba(16,185,129,.16); animation: landing-float-one 14s ease-in-out infinite; }
+.landing-orb-two { right: -8rem; top: 12rem; height: 25rem; width: 25rem; background: rgba(59,130,246,.13); animation: landing-float-two 17s ease-in-out infinite; }
+.landing-reveal { animation: landing-reveal .62s cubic-bezier(.2,.8,.2,1) both; }
+.landing-reveal-delay { animation-delay: .12s; }
+.landing-preview { animation: landing-float-two 11s ease-in-out infinite; }
+.landing-chart-bar { transform-origin: bottom; animation: landing-bar .65s cubic-bezier(.2,.8,.2,1) both; }
+.landing-feature { transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
+.landing-feature:hover { transform: translateY(-5px); border-color: color-mix(in srgb, var(--color-primary-100) 92%, var(--color-border)); box-shadow: 0 18px 38px rgba(15,23,42,.08); }
+.landing-menu { transition: opacity .22s ease; }
+
+.dark .landing-page { background-image: radial-gradient(circle at 14% 0%, rgba(16,185,129,.13), transparent 28rem), #07111b; }
+.dark .landing-feature:hover { box-shadow: 0 18px 38px rgba(0,0,0,.2); }
+
 @media (max-width: 639px) {
   .app-header { min-height: 64px; }
   .app-header .app-search { padding-top: .58rem; padding-bottom: .58rem; }
@@ -130,7 +150,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .login-bubble, .login-bubble-alt, .login-glass::after, .login-tab-active, .app-content > * { animation: none; }
+  .login-bubble, .login-bubble-alt, .login-glass::after, .login-tab-active, .app-content > *, .landing-orb-one, .landing-orb-two, .landing-reveal, .landing-preview, .landing-chart-bar { animation: none; }
 }
 
 /* Dark palette — kaliya CSS vars-ka ayaan bedelnay, component-yada wax kama
