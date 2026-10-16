@@ -11,7 +11,6 @@ import {
   GraduationCap,
   Megaphone,
   Menu,
-  MessageCircle,
   School,
   ShieldCheck,
   Sparkles,
@@ -21,7 +20,6 @@ import {
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import ThemeToggle from '@/components/ThemeToggle'
-import { whatsappLink } from '@/lib/contact'
 import logo from '@/assets/iskuulcaawiye-logo.png'
 import brandMark from '@/assets/brand-mark.png'
 
@@ -29,7 +27,7 @@ const navItems = [
   { label: 'Features', href: '#features' },
   { label: 'Roles', href: '#roles' },
   { label: 'Pricing', href: '#pricing' },
-  { label: 'Contact us', href: '#contact' },
+  { label: 'Register', href: '#apply' },
 ]
 
 const featureCards = [
@@ -232,15 +230,14 @@ function LandingPage() {
               >
                 Gal systemka
               </Link>
-              <a
-                href={whatsappLink('Asc. Waxaan rabaa inaan wax badan ka ogaado IskuulCaawiye oo aan akoon iskuul sameysto.')}
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                to="/signup"
+                onClick={() => setMenuOpen(false)}
                 className="flex w-full items-center justify-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3.5 text-sm font-semibold text-emerald-800 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300"
               >
-                <MessageCircle size={17} />
-                WhatsApp nagala soo xiriir
-              </a>
+                Submit application
+                <ArrowRight size={17} />
+              </Link>
             </div>
           </div>
         </div>
@@ -272,10 +269,10 @@ function LandingPage() {
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
-                  to="/login"
+                  to="/signup"
                   className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-950 px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-slate-950/10 transition hover:-translate-y-0.5 hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200"
                 >
-                  Gal systemka
+                  Submit application
                   <ArrowRight size={17} className="transition-transform group-hover:translate-x-0.5" />
                 </Link>
                 <a
@@ -489,22 +486,20 @@ function LandingPage() {
                     <span className="mb-2 text-sm text-slate-500 dark:text-slate-400">{item.note}</span>
                   </div>
                   <div className="mt-6 space-y-3">
-                    {['Dhammaan features-ka muhiimka ah', 'Admin + Teacher + Student roles', 'Natiijooyin & announcements loogu talagalay ardayda', 'Support via WhatsApp'].map((itemText) => (
+                    {['Dhammaan features-ka muhiimka ah', 'Admin + Teacher + Student roles', 'Natiijooyin & announcements loogu talagalay ardayda', 'Review iyo account setup ammaan ah'].map((itemText) => (
                       <div key={itemText} className="flex items-start gap-2.5 text-sm text-slate-600 dark:text-slate-300">
                         <Check size={16} className="mt-0.5 shrink-0 text-emerald-600" />
                         <span>{itemText}</span>
                       </div>
                     ))}
                   </div>
-                  <a
-                    href={whatsappLink(`Asc. Waxaan rabaa inaan IskuulCaawiye u isticmaalo iskuulkayga (${item.range}).`)}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <Link
+                    to="/signup"
                     className={`mt-7 flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3.5 text-sm font-bold transition hover:-translate-y-0.5 ${item.featured ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-slate-950 text-white hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200'}`}
                   >
-                    Bilow WhatsApp
+                    Submit application
                     <ArrowRight size={16} />
-                  </a>
+                  </Link>
                 </article>
               ))}
             </div>
@@ -515,15 +510,13 @@ function LandingPage() {
                   <p className="text-sm font-extrabold text-slate-950 dark:text-white">701+ arday?</p>
                   <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">La xiriir si aan uga wada hadalno qiimaha ku habboon iskuulkaaga.</p>
                 </div>
-                <a
-                  href={whatsappLink('Asc. Waxaan rabaa qiimeyn loogu sameeyo IskuulCaawiye ee iskuul leh 701+ arday.')}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  to="/signup"
                   className="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl border border-slate-200 px-5 py-3 text-sm font-bold text-slate-800 transition hover:bg-slate-50 dark:border-white/10 dark:text-white dark:hover:bg-white/10"
                 >
-                  Contact us
-                  <MessageCircle size={16} />
-                </a>
+                  Submit application
+                  <ArrowRight size={16} />
+                </Link>
               </div>
             </div>
 
@@ -542,26 +535,24 @@ function LandingPage() {
           </div>
         </section>
 
-        <section id="contact" className="scroll-mt-24 py-24 sm:py-28">
+        <section id="apply" className="scroll-mt-24 py-24 sm:py-28">
           <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
             <div className="overflow-hidden rounded-[36px] bg-slate-950 px-6 py-14 text-white sm:px-10 sm:py-16 lg:px-14">
               <div className="grid gap-10 lg:grid-cols-[1.3fr_.7fr] lg:items-center">
                 <div>
-                  <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-300">Contact us</p>
-                  <h2 className="mt-3 max-w-2xl text-3xl font-black tracking-tight sm:text-4xl">Iskuulkaaga ma rabtaa inuu isticmaalo IskuulCaawiye system?</h2>
-                  <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300">Si aad u gasho systemka, iskuulkaagu wuxuu u baahan yahay in akoon amaan ah systemka loogu sameeyo.Fadlan Nagala soo xiriir WhatsApp si aan kuugu sharaxno systemka, uga jawaabno su'aalahaaga, una diyaarino akoonka iskuulkaaga mahadsanid!.</p>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-300">Get started</p>
+                  <h2 className="mt-3 max-w-2xl text-3xl font-black tracking-tight sm:text-4xl">Iskuulkaaga ma rabtaa inuu isticmaalo IskuulCaawiye?</h2>
+                  <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300">Gudbi codsigaaga adigoo buuxinaya xogta iskuulka. Kooxdayadu way review-gareynaysaa, kadibna account ammaan ah ayaa loo diyaarinayaa iskuulkaaga.</p>
                 </div>
                 <div className="lg:justify-self-end">
-                  <a
-                    href={whatsappLink('Asc. Waxaan rabaa in IskuulCaawiye akoon loogu sameeyo iskuulkayga. Fadlan ila soo xiriir.')}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <Link
+                    to="/signup"
                     className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-500 px-6 py-4 text-sm font-black text-white shadow-lg shadow-emerald-950/30 transition hover:-translate-y-0.5 hover:bg-emerald-400 sm:w-auto"
                   >
-                    <MessageCircle size={18} />
-                    WhatsApp nagala soo xiriir
-                  </a>
-                  <p className="mt-3 text-center text-xs text-slate-400 lg:text-right">Waxaad ku bilaabi kartaa fariin gaaban.</p>
+                    Submit application
+                    <ArrowRight size={18} />
+                  </Link>
+                  <p className="mt-3 text-center text-xs text-slate-400 lg:text-right">Codsigaaga waxaa lagu samaynayaa review ka hor account setup.</p>
                 </div>
               </div>
             </div>
@@ -585,20 +576,11 @@ function LandingPage() {
               </a>
             ))}
             <Link to="/login" className="hover:text-slate-950 dark:hover:text-white">Login</Link>
+            <Link to="/signup" className="hover:text-slate-950 dark:hover:text-white">Register</Link>
           </div>
           <p className="text-xs text-slate-400">© {new Date().getFullYear()} IskuulCaawiye</p>
         </div>
       </footer>
-
-      <a
-        href={whatsappLink('Asc. Waxaan rabaa inaan wax badan ka ogaado IskuulCaawiye.')}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-5 right-5 z-30 inline-flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500 text-white shadow-2xl shadow-emerald-950/25 transition hover:-translate-y-1 hover:bg-emerald-400"
-        aria-label="WhatsApp nagala soo xiriir"
-      >
-        <MessageCircle size={25} />
-      </a>
     </div>
   )
 }

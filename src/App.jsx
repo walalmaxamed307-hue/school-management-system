@@ -36,6 +36,7 @@ import HomeworkPage from '@/pages/HomeworkPage'
 import AssignmentsPage from '@/pages/AssignmentsPage'
 import StudentHomeworkPage from '@/pages/StudentHomeworkPage'
 import LandingPage from './pages/LandingPage'
+import SignupPage from './pages/SignupPage'
 import OwnerDashboardPage from '@/pages/OwnerDashboardPage'
 import OwnersPage from '@/pages/OwnersPage'
 import OwnerLayout from './layouts/OwnerLayout'
@@ -84,6 +85,7 @@ function Shell() {
           <Routes>
               <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage/>} />
+            <Route path="/signup" element={<SignupPage />} />
 
             <Route
               element={
