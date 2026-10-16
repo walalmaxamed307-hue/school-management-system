@@ -268,14 +268,7 @@ function LandingPage() {
               </p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-               <Link
-                to="/signup"
-                onClick={() => setMenuOpen(false)}
-                className="flex w-full items-center justify-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3.5 text-sm font-semibold text-emerald-800 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300"
-              >
-                Submit application
-                <ArrowRight size={17} />
-              </Link>
+              
              <Link
                   to="/login"
                   className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-950 px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-slate-950/10 transition hover:-translate-y-0.5 hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200"
@@ -283,6 +276,14 @@ function LandingPage() {
                  Login
                   <ArrowRight size={17} className="transition-transform group-hover:translate-x-0.5" />
                 </Link>
+                 <Link
+                to="/signup"
+                onClick={() => setMenuOpen(false)}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3.5 text-sm font-semibold text-emerald-800 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300"
+              >
+                Submit application
+                <ArrowRight size={17} />
+              </Link>
               </div>
 
               <div className="mt-9 grid max-w-xl grid-cols-2 gap-3 sm:grid-cols-3">
