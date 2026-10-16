@@ -108,8 +108,29 @@ body {
 .dark .login-field { border-color: rgba(167,243,208,.16); background: rgba(2,20,14,.5); }
 .dark .login-field:focus-within { border-color: rgba(52,211,153,.75); box-shadow: 0 0 0 4px rgba(16,185,129,.13), 0 10px 32px rgba(0,0,0,.24); }
 
+/* Internal app navigation — smooth visual improvements, without changing
+   routes or page functionality. */
+.app-sidebar { box-shadow: 12px 0 36px rgba(15, 23, 42, .045); transition: transform .32s cubic-bezier(.2,.8,.2,1), box-shadow .25s ease; }
+.app-nav-backdrop { transition: opacity .25s ease; }
+.app-profile { background: linear-gradient(135deg, color-mix(in srgb, var(--color-primary-50) 75%, transparent), var(--color-canvas)); border: 1px solid color-mix(in srgb, var(--color-primary-100) 60%, var(--color-border)); }
+.app-nav-link { position: relative; transition: background-color .2s ease, color .2s ease, transform .2s ease, box-shadow .2s ease; }
+.app-nav-link:hover { transform: translateX(2px); }
+.app-nav-link-active { color: var(--color-primary-600); background: linear-gradient(90deg, var(--color-primary-50), color-mix(in srgb, var(--color-primary-50) 25%, transparent)); box-shadow: inset 3px 0 0 var(--color-primary-500); }
+.app-header { box-shadow: 0 3px 14px rgba(15, 23, 42, .025); }
+.app-search { transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease; }
+.app-search:focus { border-color: var(--color-primary-500); background: var(--color-surface); box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary-100) 48%, transparent); }
+.app-content > * { animation: app-page-enter .32s ease-out both; }
+@keyframes app-page-enter { from { opacity: .65; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+.dark .app-sidebar { box-shadow: 12px 0 36px rgba(0, 0, 0, .16); }
+
+@media (max-width: 639px) {
+  .app-header { min-height: 64px; }
+  .app-header .app-search { padding-top: .58rem; padding-bottom: .58rem; }
+  .app-content { padding-bottom: 1.5rem; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .login-bubble, .login-bubble-alt, .login-glass::after, .login-tab-active { animation: none; }
+  .login-bubble, .login-bubble-alt, .login-glass::after, .login-tab-active, .app-content > * { animation: none; }
 }
 
 /* Dark palette — kaliya CSS vars-ka ayaan bedelnay, component-yada wax kama

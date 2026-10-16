@@ -4,7 +4,9 @@ import { createContext, useEffect, useState } from 'react'
 export const ThemeContext = createContext(null)
 
 function getStoredTheme() {
-  return localStorage.getItem('theme') ?? 'dark'
+  // Key cusub: preference-kii hore ee dark ahaa ma qasbayo users-ka inay
+  // dark ku furmaan. Default-ka systemka hadda waa light.
+  return localStorage.getItem('theme-preference') ?? 'light'
 }
 
 export function ThemeProvider({ children }) {
@@ -14,7 +16,7 @@ export function ThemeProvider({ children }) {
   // <html> — CSS vars-ka (.dark { ... } index.css) ayaa halkaas ka dhaqmaya.
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark')
-    localStorage.setItem('theme', theme)
+    localStorage.setItem('theme-preference', theme)
   }, [theme])
 
   function toggleTheme() {
