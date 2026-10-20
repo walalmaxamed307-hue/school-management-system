@@ -35,6 +35,7 @@ import StudentRoomPage from '@/pages/StudentRoomPage'
 import HomeworkPage from '@/pages/HomeworkPage'
 import AssignmentsPage from '@/pages/AssignmentsPage'
 import StudentHomeworkPage from '@/pages/StudentHomeworkPage'
+import StudentPinSetupPage from '@/pages/StudentPinSetupPage'
 import LandingPage from './pages/LandingPage'
 import SignupPage from './pages/SignupPage'
 import OwnerDashboardPage from '@/pages/OwnerDashboardPage'
@@ -86,6 +87,11 @@ function Shell() {
               <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage/>} />
             <Route path="/signup" element={<SignupPage />} />
+
+            <Route
+              path="/student-pin"
+              element={<ProtectedRoute allowedRoles={['student']}><StudentPinSetupPage /></ProtectedRoute>}
+            />
 
             <Route
               element={

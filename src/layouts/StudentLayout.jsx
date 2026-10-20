@@ -26,7 +26,6 @@ function StudentLayout() {
 
   const details = [
     ['Student ID', user?.studentCode || '—'],
-    ['Dhalashada', user?.dob || '—'],
     ['Fasal', [user?.class, user?.section].filter(Boolean).join(' · ') || '—'],
   ]
 
@@ -53,7 +52,7 @@ function StudentLayout() {
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary-50 text-primary-600"><UserRound size={21} /></span>
               <div className="min-w-0"><p className="text-xs font-medium uppercase tracking-wide text-ink-muted">Student portal</p><h1 className="truncate text-lg font-medium text-ink">{user?.name || 'Arday'}</h1></div>
             </div>
-            <dl className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-3 sm:gap-4">
+            <dl className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-2 sm:gap-4">
               {details.map(([label, value]) => <div key={label} className="min-w-0 rounded-xl bg-canvas px-3 py-2"><dt className="text-xs text-ink-muted">{label}</dt><dd className="mt-0.5 break-words font-medium text-ink">{value}</dd></div>)}
             </dl>
           </div>

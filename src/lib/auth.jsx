@@ -54,13 +54,24 @@ export function AuthProvider({ children }) {
     }
   }, [])
 
-  const loginAsStudent = useCallback(async (studentCode, dob) => {
+  const loginAsStudent = useCallback(async (studentCode, pin = '') => {
     try {
       const data = await api.post(
         '/auth/student-login',
-        { studentCode: studentCode.trim(), dob },
+        { studentCode: studentCode.trim(), pin },
         { auth: false }
       )
+      setToken(data.token)
+      setUser(data.user)
+      return { success: true, user: data.user }
+    } catch (err) {
+      return { success: false, error: err.message }
+    }
+  }, [])
+
+  const setStudentPin = useCallback(async (pin, confirmPin) => {
+    try {
+      const data = await api.post('/auth/student-pin', { pin, confirmPin })
       setToken(data.token)
       setUser(data.user)
       return { success: true, user: data.user }
@@ -87,7 +98,7 @@ export function AuthProvider({ children }) {
   }, [])
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, loginAsStudent, changePassword, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, loginAsStudent, setStudentPin, changePassword, logout }}>
       {children}
     </AuthContext.Provider>
   )
