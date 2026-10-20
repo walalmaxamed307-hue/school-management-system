@@ -37,11 +37,17 @@ export function ExamResultsProvider({ children }) {
     [showToast]
   )
 
-  // name + isFinal — waxaa la abuuraa sanadka HADDA socda kaliya (backend-ku
+  // name + isFinal (+ parts haddii loo baahdo) — waxaa la abuuraa sanadka HADDA socda kaliya (backend-ku
   // sidaas ayuu qabtaa); admin ayaa kaliya samayn kara.
-  async function createExam(name, isFinal) {
+  async function createExam(name, isFinal, hasParts = false, partOneMaxMark, partTwoMaxMark) {
     try {
-      await api.post('/exams', { name: name.trim(), isFinal, order: exams.length })
+      await api.post('/exams', {
+        name: name.trim(),
+        isFinal,
+        order: exams.length,
+        hasParts,
+        ...(hasParts ? { partOneMaxMark: Number(partOneMaxMark), partTwoMaxMark: Number(partTwoMaxMark) } : {}),
+      })
       await loadExams(examsYearId)
       return true
     } catch (err) {
@@ -62,16 +68,16 @@ export function ExamResultsProvider({ children }) {
   }
 
   const loadResults = useCallback(
-    async (examId, classId, sectionId) => {
+    async (examId, classId, sectionId, part) => {
       if (!examId || !classId) {
         setResults(null)
         setCurrent(null)
         return
       }
-      setCurrent({ examId, classId, sectionId })
+      setCurrent({ examId, classId, sectionId, part: part || null })
       setResultsLoading(true)
       try {
-        setResults(await api.get(`/exams/${examId}/results`, { classId, sectionId: sectionId || undefined }))
+        setResults(await api.get(`/exams/${examId}/results`, { classId, sectionId: sectionId || undefined, part: part || undefined }))
       } catch (err) {
         showToast(err.message, 'error')
         setResults(null)
@@ -98,10 +104,10 @@ export function ExamResultsProvider({ children }) {
         : prev
     )
     try {
-      await api.put(`/exams/${current.examId}/results`, { enrollmentId, subjectId, mark })
+      await api.put(`/exams/${current.examId}/results`, { enrollmentId, subjectId, mark, part: current.part })
     } catch (err) {
       showToast(err.message, 'error')
-      loadResults(current.examId, current.classId, current.sectionId)
+      loadResults(current.examId, current.classId, current.sectionId, current.part)
     }
   }
 
@@ -111,8 +117,9 @@ export function ExamResultsProvider({ children }) {
       await api.post(`/exams/${current.examId}/publish`, {
         classId: current.classId,
         sectionId: current.sectionId,
+        part: current.part,
       })
-      await loadResults(current.examId, current.classId, current.sectionId)
+      await loadResults(current.examId, current.classId, current.sectionId, current.part)
       return true
     } catch (err) {
       showToast(err.message, 'error')

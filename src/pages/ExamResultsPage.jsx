@@ -88,7 +88,11 @@ function ExamResultsPage() {
   const [addTermOpen, setAddTermOpen] = useState(false)
   const [newTermName, setNewTermName] = useState('')
   const [newTermFinal, setNewTermFinal] = useState(false)
+  const [newTermHasParts, setNewTermHasParts] = useState(false)
+  const [newTermPartOneMax, setNewTermPartOneMax] = useState('')
+  const [newTermPartTwoMax, setNewTermPartTwoMax] = useState('')
   const [savingTerm, setSavingTerm] = useState(false)
+  const [selectedPart, setSelectedPart] = useState('1')
 
   // Ka hor fasallada in ay ka soo daahaan (async), dib ugu celi fasalka
   // koowaad haddii kii la doortay uusan (weli) jirin — isla saxitaanka
@@ -122,24 +126,31 @@ function ExamResultsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exams])
 
+  useEffect(() => {
+    setSelectedPart('1')
+  }, [examId])
+
   const sectionOk = !selectedClassObj?.hasSections || !!selectedSection
   useEffect(() => {
     if (examId && selectedClassObj && sectionOk) {
-      loadResults(examId, selectedClassObj.id, selectedSectionId)
+      loadResults(examId, selectedClassObj.id, selectedSectionId, selectedPart)
       setUnlocked(false)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [examId, selectedClassObj?.id, selectedSectionId, sectionOk])
+  }, [examId, selectedClassObj?.id, selectedSectionId, sectionOk, selectedPart])
 
   async function handleAddTerm(e) {
     e.preventDefault()
     if (!newTermName.trim()) return
     setSavingTerm(true)
-    const ok = await createExam(newTermName, newTermFinal)
+    const ok = await createExam(newTermName, newTermFinal, newTermHasParts, newTermPartOneMax, newTermPartTwoMax)
     setSavingTerm(false)
     if (ok) {
       setNewTermName('')
       setNewTermFinal(false)
+      setNewTermHasParts(false)
+      setNewTermPartOneMax('')
+      setNewTermPartTwoMax('')
       setAddTermOpen(false)
     }
   }
@@ -162,10 +173,15 @@ function ExamResultsPage() {
   }
 
   const rows = (results?.rows ?? []).filter((r) => r.name.toLowerCase().includes(query.toLowerCase()))
-  const maxMark = results?.exam?.examMaxMark ?? settings.examMaxMark
+  const maxMark = results?.exam?.inputMaxMark ?? results?.exam?.examMaxMark ?? settings.examMaxMark
   const isFinal = results?.exam?.isFinal ?? false
+  const hasParts = results?.exam?.hasParts ?? false
   const allPublished = results?.allPublished ?? false
-  const canPublish = (results?.canPublish ?? false) && isCurrentYear
+  const partOnePublished = results?.partOnePublished ?? false
+  const canManageResults = (results?.canPublish ?? false) && isCurrentYear
+  const canPublish = canManageResults
+  const activePartPublished = hasParts && selectedPart === '1' ? partOnePublished : allPublished
+  const showCombinedPartResults = hasParts && selectedPart === '2' && allPublished && !unlocked
 
   return (
     <div>
@@ -188,7 +204,7 @@ function ExamResultsPage() {
             {exams.length === 0 && <option value="">Wali term lama darin</option>}
             {exams.map((e) => (
               <option key={e._id} value={e._id}>
-                {e.name}
+                {e.name}{e.hasParts ? ' (Parts)' : ''}
               </option>
             ))}
           </select>
@@ -257,9 +273,22 @@ function ExamResultsPage() {
       )}
 
       <p className="mb-4 text-xs text-ink-muted">
-        Ugu badnaan dhibcaha maado kasta: <strong>{maxMark}</strong>
+        Ugu badnaan dhibcaha maado kasta{hasParts ? ` ee Part ${selectedPart}` : ''}: <strong>{maxMark}</strong>
         {isTeacher && ' (admin-ka ayaa dejiya, akhris-kaliya)'}
       </p>
+
+      {hasParts && (
+        <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-border bg-surface p-3">
+          <span className="mr-1 text-sm font-medium text-ink">Qaybta:</span>
+          <button type="button" onClick={() => setSelectedPart('1')} className={`rounded-lg px-3 py-2 text-sm font-medium ${selectedPart === '1' ? 'bg-primary-500 text-white' : 'bg-canvas text-ink-muted'}`}>
+            Part 1 · {results?.exam?.partOneMaxMark} dhibcood
+          </button>
+          <button type="button" onClick={() => setSelectedPart('2')} className={`rounded-lg px-3 py-2 text-sm font-medium ${selectedPart === '2' ? 'bg-primary-500 text-white' : 'bg-canvas text-ink-muted'}`}>
+            Part 2 · {results?.exam?.partTwoMaxMark} dhibcood
+          </button>
+          <span className="text-xs text-ink-muted">Part 2 publish-keeda ayaa isku daraya labada qaybood.</span>
+        </div>
+      )}
 
       {isTeacher && visibleClasses.length === 0 ? (
         <p className="rounded-lg bg-canvas px-3 py-6 text-center text-sm text-ink-muted">
@@ -290,18 +319,18 @@ function ExamResultsPage() {
                   </th>
                   {subjectItems.map((subj) => (
                     <th key={subj.id} className="whitespace-nowrap px-2 py-2 font-medium md:px-4 md:py-3 text-ink-muted">
-                      {subj.name}
+                      {subj.name}{showCombinedPartResults ? ' (P1+P2)' : ''}
                     </th>
                   ))}
-                  <th className="whitespace-nowrap px-2 py-2 font-medium md:px-4 md:py-3 text-ink-muted">Total</th>
+                  <th className="whitespace-nowrap px-2 py-2 font-medium md:px-4 md:py-3 text-ink-muted">{showCombinedPartResults ? 'Total (P1+P2)' : hasParts ? `Part ${selectedPart} total` : 'Total'}</th>
                   <th className="whitespace-nowrap px-2 py-2 font-medium md:px-4 md:py-3 text-ink-muted">Kaalinta</th>
-                  {isFinal && <th className="whitespace-nowrap px-2 py-2 font-medium md:px-4 md:py-3 text-ink-muted">Xaalad</th>}
+                  {isFinal && (!hasParts || selectedPart === '2') && <th className="whitespace-nowrap px-2 py-2 font-medium md:px-4 md:py-3 text-ink-muted">Xaalad</th>}
                 </tr>
               </thead>
               <tbody>
                 {rows.length === 0 && (
                   <tr>
-                    <td colSpan={subjectItems.length + (isFinal ? 4 : 3)} className="px-4 py-8 text-center text-ink-muted">
+                    <td colSpan={subjectItems.length + (isFinal && (!hasParts || selectedPart === '2') ? 4 : 3)} className="px-4 py-8 text-center text-ink-muted">
                       {resultsLoading ? 'Waa la soo rarayaa...' : 'Fasalkan arday kuma jiro'}
                     </td>
                   </tr>
@@ -322,34 +351,40 @@ function ExamResultsPage() {
                     </td>
                     {subjectItems.map((subj) => (
                       <td key={subj.id} className="px-1 py-1.5 md:px-2 md:py-2">
-                        <input
-                          type="number"
-                          min="0"
-                          max={maxMark}
-                          disabled={
-                            !canEditSubject(selectedClassObj.id, selectedSectionId, subj.id) ||
-                            !isCurrentYear ||
-                            (row.published && !unlocked)
-                          }
-                          value={row.marks[subj.id] ?? ''}
-                          onChange={(e) => {
-                            const clamped = Math.max(0, Math.min(Number(e.target.value), maxMark))
-                            setMark(row.enrollmentId, subj.id, clamped)
-                          }}
-                          className="w-12 rounded-md border border-border px-1 py-1 text-xs outline-none focus:border-primary-500 disabled:opacity-50 md:w-16 md:px-2 md:text-sm"
-                        />
+                        {showCombinedPartResults ? (
+                          <span className="inline-flex min-w-12 justify-center rounded-md bg-primary-50 px-2 py-1 font-medium text-primary-700 md:min-w-16">
+                            {row.combinedMarks?.[subj.id] ?? 0}
+                          </span>
+                        ) : (
+                          <input
+                            type="number"
+                            min="0"
+                            max={maxMark}
+                            disabled={
+                              !canEditSubject(selectedClassObj.id, selectedSectionId, subj.id) ||
+                              !isCurrentYear ||
+                              (row.published && !unlocked && (!hasParts || (selectedPart === '1' ? row.publishedPart >= 1 : row.publishedPart >= 2)))
+                            }
+                            value={row.marks[subj.id] ?? ''}
+                            onChange={(e) => {
+                              const clamped = Math.max(0, Math.min(Number(e.target.value), maxMark))
+                              setMark(row.enrollmentId, subj.id, clamped)
+                            }}
+                            className="w-12 rounded-md border border-border px-1 py-1 text-xs outline-none focus:border-primary-500 disabled:opacity-50 md:w-16 md:px-2 md:text-sm"
+                          />
+                        )}
                       </td>
                     ))}
-                    <td className="px-2 py-1.5 font-medium text-ink md:px-4 md:py-2">{row.total}</td>
-                    <td className="px-2 py-1.5 text-ink md:px-4 md:py-2">#{row.rank}</td>
-                    {isFinal && (
+                    <td className="px-2 py-1.5 font-medium text-ink md:px-4 md:py-2">{showCombinedPartResults ? row.combinedTotal : row.total}</td>
+                    <td className="px-2 py-1.5 text-ink md:px-4 md:py-2">#{showCombinedPartResults ? row.combinedRank : row.rank}</td>
+                    {isFinal && (!hasParts || selectedPart === '2') && (
                       <td className="px-2 py-1.5 md:px-4 md:py-2">
                         <span
                           className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                            row.total >= settings.passMark ? 'bg-primary-50 text-primary-600' : 'bg-danger-50 text-danger-500'
+                          (showCombinedPartResults ? row.combinedTotal : row.total) >= settings.passMark ? 'bg-primary-50 text-primary-600' : 'bg-danger-50 text-danger-500'
                           }`}
                         >
-                          {row.total >= settings.passMark ? 'Gudbay' : 'Dhacay'}
+                          {(showCombinedPartResults ? row.combinedTotal : row.total) >= settings.passMark ? 'Gudbay' : 'Dhacay'}
                         </span>
                       </td>
                     )}
@@ -364,29 +399,31 @@ function ExamResultsPage() {
 
       {exams.length > 0 && sectionOk && (
         <div className="mt-4 flex flex-col gap-3 no-print sm:flex-row sm:items-center sm:justify-between">
-          {allPublished ? (
+          {activePartPublished ? (
             <span className="flex items-center gap-1 text-sm font-medium text-primary-600">
-              <CheckCircle2 size={16} /> waa la published
+              <CheckCircle2 size={16} /> {hasParts && selectedPart === '1' ? 'Part 1 waa la published — ardaydu way arki karaan' : 'waa la published'}
               {unlocked && ' — hadda editable, republish marka aad dhammaysato'}
             </span>
           ) : (
             <span className="text-sm text-ink-muted">
-              Marka macalimiinta dhammaystiraan maadooyinka, fasalka horjoogaha ayaa publish gareeya
+              {hasParts && selectedPart === '1'
+                ? 'Marka macalimiinta dhammaystiraan Part 1, fasalka horjoogaha ayaa publish gareeya si ardaydu u arkaan.'
+                : 'Marka macalimiinta dhammaystiraan maadooyinka, fasalka horjoogaha ayaa publish gareeya'}
             </span>
           )}
-          {allPublished && !unlocked ? (
+          {activePartPublished && !unlocked ? (
             <Button variant="secondary" onClick={() => setUnlocked(true)} disabled={!canPublish} className="w-full sm:w-auto">
-              Edit
+              {hasParts && selectedPart === '1' ? 'Edit Part 1' : 'Edit'}
             </Button>
           ) : (
             <Button onClick={handlePublish} disabled={rows.length === 0 || !canPublish} className="w-full sm:w-auto">
-              {allPublished ? 'Republish' : 'Publish'}
+              {activePartPublished ? `Republish${hasParts ? ` Part ${selectedPart}` : ''}` : `Publish${hasParts ? ` Part ${selectedPart}` : ''}`}
             </Button>
           )}
         </div>
       )}
 
-      {isTeacher && exams.length > 0 && sectionOk && !canPublish && isCurrentYear && (
+      {isTeacher && exams.length > 0 && sectionOk && !canManageResults && isCurrentYear && (
         <p className="mt-2 text-xs text-ink-muted">
           Fasalka horjoogihiisu kaliya ayaa publish gareyn kara fasalkan.
         </p>
@@ -408,7 +445,18 @@ function ExamResultsPage() {
             <input type="checkbox" checked={newTermFinal} onChange={(e) => setNewTermFinal(e.target.checked)} />
             Kani waa Final Exam-ka (kaliya mid ayaa sanad kasta la yeelan karaa)
           </label>
-          <Button type="submit" disabled={!newTermName.trim() || savingTerm}>
+          <label className="flex items-center gap-2 text-sm text-ink">
+            <input type="checkbox" checked={newTermHasParts} onChange={(e) => setNewTermHasParts(e.target.checked)} />
+            Imtixaankani ma leeyahay Part 1 iyo Part 2?
+          </label>
+          {newTermHasParts && (
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Input label="Part 1 — dhibcaha ugu badan" type="number" min="1" value={newTermPartOneMax} onChange={(e) => setNewTermPartOneMax(e.target.value)} />
+              <Input label="Part 2 — dhibcaha ugu badan" type="number" min="1" value={newTermPartTwoMax} onChange={(e) => setNewTermPartTwoMax(e.target.value)} />
+              <p className="text-xs leading-5 text-ink-muted sm:col-span-2">Marka Part 2 la publish-gareeyo, dhibcaha labada qayb ayaa maado kasta la isu darayaa.</p>
+            </div>
+          )}
+          <Button type="submit" disabled={!newTermName.trim() || savingTerm || (newTermHasParts && (!Number(newTermPartOneMax) || !Number(newTermPartTwoMax)))}>
             {savingTerm ? 'Waa la keydinayaa...' : 'Ku dar'}
           </Button>
         </form>
