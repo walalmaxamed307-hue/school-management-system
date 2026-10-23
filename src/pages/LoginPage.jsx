@@ -4,6 +4,7 @@ import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { ArrowRight, GraduationCap, Hash, Headphones, KeyRound, Mail, ShieldCheck, Sparkles, UsersRound } from 'lucide-react'
 import brandMark from '@/assets/brand-mark.png'
 import { useAuth } from '@/hooks/useAuth'
+import { api } from '@/lib/api'
 import WhatsAppButton from '@/components/WhatsAppButton'
 import ThemeToggle from '@/components/ThemeToggle'
 import { Button } from '@/components/ui'
@@ -21,9 +22,21 @@ function StaffLoginForm() {
 }
 
 function StudentLoginForm() {
-  const [authError, setAuthError] = useState(''); const { loginAsStudent } = useAuth(); const navigate = useNavigate(); const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm()
-  async function onSubmit(values) { setAuthError(''); const result = await loginAsStudent(values.studentId, values.pin || ''); if (result.success) { localStorage.removeItem(APPLICATION_PENDING_KEY); return navigate(result.user.needsPinSetup ? '/student-pin' : '/my-results') }; setAuthError(result.error) }
-  return <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4"><LoginInput icon={Hash} label="Student ID" placeholder="STU-000123" error={errors.studentId?.message} {...register('studentId', { required: 'Student ID waa loo baahan yahay' })}/><LoginInput icon={KeyRound} label="PIN (haddii aad hore u samaysatay)" type="password" inputMode="numeric" placeholder="4–6 lambar" error={errors.pin?.message} {...register('pin', { pattern: { value: /^$|^\d{4,6}$/, message: 'PIN-ku waa 4 ilaa 6 lambar' } })}/><p className="-mt-2 text-xs leading-5 text-ink-muted">Marka ugu horreysa geli Student ID-ga oo keliya; gudaha ayaad PIN ku samaysanaysaa.</p>{authError && <p className="rounded-xl bg-danger-50 px-3 py-2 text-sm text-danger-500">{authError}</p>}<Button type="submit" className="login-button min-h-13 w-full rounded-2xl" disabled={isSubmitting}>{isSubmitting ? 'Waa la galayaa...' : <>Gal student portal <ArrowRight size={17}/></>}</Button></form>
+  const [authError, setAuthError] = useState(''); const [student, setStudent] = useState(null); const { loginAsStudent } = useAuth(); const navigate = useNavigate(); const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm()
+  async function onSubmit(values) {
+    setAuthError('')
+    if (!student) {
+      try {
+        const found = await api.post('/auth/student-lookup', { studentCode: values.studentId }, { auth: false })
+        setStudent({ ...found, studentId: values.studentId.trim() })
+      } catch (err) { setAuthError(err.message) }
+      return
+    }
+    const result = await loginAsStudent(student.studentId, student.needsPinSetup ? '' : (values.pin || ''))
+    if (result.success) { localStorage.removeItem(APPLICATION_PENDING_KEY); return navigate(result.user.needsPinSetup ? '/student-pin' : '/my-results') }
+    setAuthError(result.error)
+  }
+  return <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4"><LoginInput icon={Hash} label="Student ID" placeholder="STU-000123" disabled={!!student} error={errors.studentId?.message} {...register('studentId', { required: 'Student ID waa loo baahan yahay', onChange: () => { if (student) setStudent(null) } })}/>{student && <div className="rounded-2xl border border-primary-100 bg-primary-50 px-4 py-3"><p className="text-xs font-medium text-primary-600">Akoonka ardayga</p><p className="mt-1 text-base font-bold text-ink">{student.name}</p><button type="button" onClick={() => setStudent(null)} className="mt-1 text-xs font-semibold text-primary-600 underline">Bedel Student ID</button></div>}{student && !student.needsPinSetup && <LoginInput icon={KeyRound} label="PIN-kaaga" type="password" inputMode="numeric" placeholder="4–6 lambar" error={errors.pin?.message} {...register('pin', { required: 'PIN-ka geli', pattern: { value: /^\d{4,6}$/, message: 'PIN-ku waa 4 ilaa 6 lambar' } })}/>}<p className="-mt-2 text-xs leading-5 text-ink-muted">{student?.needsPinSetup ? 'PIN hore looma samayn. Sii wad si aad gudaha uga samaysato PIN.' : student ? 'Hubi magaca kore, kadib geli PIN-kaaga.' : 'Marka hore geli Student ID-gaaga si magacaaga loo xaqiijiyo.'}</p>{authError && <p className="rounded-xl bg-danger-50 px-3 py-2 text-sm text-danger-500">{authError}</p>}<Button type="submit" className="login-button min-h-13 w-full rounded-2xl" disabled={isSubmitting}>{isSubmitting ? 'Waa la hubinayaa...' : student ? student.needsPinSetup ? <>Sii wad oo samee PIN <ArrowRight size={17}/></> : <>Gal student portal <ArrowRight size={17}/></> : <>Hubi Student ID <ArrowRight size={17}/></>}</Button></form>
 }
 
 function LoginPage() {
