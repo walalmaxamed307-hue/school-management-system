@@ -37,7 +37,7 @@ export function RoomsProvider({ children }) {
   }
 
   const loadSplit = useCallback(
-    async (forExamId) => {
+    async (forExamId, attendanceDate) => {
       setExamId(forExamId)
       if (!forExamId) {
         setSplit({})
@@ -45,7 +45,7 @@ export function RoomsProvider({ children }) {
       }
       setSplitLoading(true)
       try {
-        setSplit(await api.get(`/exams/${forExamId}/room-split`))
+        setSplit(await api.get(`/exams/${forExamId}/room-split`, { date: attendanceDate || undefined }))
       } catch (err) {
         showToast(err.message, 'error')
         setSplit({})
@@ -58,11 +58,13 @@ export function RoomsProvider({ children }) {
 
   // Kaliya fasalada la doortay (classIds) ayaa la kala qaybinayaa room-yada
   // la doortay (roomIds), round-robin — backend-ku ayaa qabta xisaabinta.
-  async function splitClasses(classIds, roomIds) {
+  async function splitClasses(classIds, roomIds, attendanceDate) {
     if (!examId) return false
     try {
+      // Room allocation belongs to the term; attendanceDate is used only for
+      // the daily Present/Absent records, never for creating a new split.
       await api.post(`/exams/${examId}/room-split`, { classIds, roomIds })
-      await loadSplit(examId)
+      await loadSplit(examId, attendanceDate)
       return true
     } catch (err) {
       showToast(err.message, 'error')
@@ -70,11 +72,11 @@ export function RoomsProvider({ children }) {
     }
   }
 
-  async function updateAssignment(enrollmentId, patch) {
+  async function updateAssignment(enrollmentId, patch, attendanceDate) {
     if (!examId) return false
     try {
-      await api.patch(`/exams/${examId}/room-split/${enrollmentId}`, patch)
-      await loadSplit(examId)
+      await api.patch(`/exams/${examId}/room-split/${enrollmentId}`, { ...patch, attendanceDate })
+      await loadSplit(examId, attendanceDate)
       return true
     } catch (err) {
       showToast(err.message, 'error')

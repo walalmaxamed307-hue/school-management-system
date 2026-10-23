@@ -14,6 +14,7 @@ const examStatusStyle = {
   present: 'bg-primary-50 text-primary-600',
   absent: 'bg-danger-50 text-danger-500',
 }
+const today = () => new Date().toISOString().slice(0, 10)
 
 function RoomsPage() {
   const { students } = useStudents()
@@ -32,6 +33,7 @@ function RoomsPage() {
   const [pickedClasses, setPickedClasses] = useState([])
   const [pickedRooms, setPickedRooms] = useState([])
   const [examId, setExamId] = useState('')
+  const [attendanceDate, setAttendanceDate] = useState(today())
 
   // Qaybinta (split) waa mid exam-gaar ah — waa in la doortaa term/exam
   // marka hore, isla sanadka hadda socda.
@@ -47,9 +49,9 @@ function RoomsPage() {
   }, [exams])
 
   useEffect(() => {
-    if (examId) loadSplit(examId)
+    if (examId) loadSplit(examId, attendanceDate)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [examId])
+  }, [examId, attendanceDate])
 
   function toggleRoom(room) {
     setExpandedRooms((prev) => ({ ...prev, [room]: !prev[room] }))
@@ -95,7 +97,7 @@ function RoomsPage() {
       showToast('Dooro ugu yaraan hal room', 'error')
       return
     }
-    const ok = await splitClasses(classIds, pickedRooms)
+    const ok = await splitClasses(classIds, pickedRooms, attendanceDate)
     if (ok) {
       setPickerOpen(false)
       showToast('Ardayda waa la kala qaybiyay.', 'success')
@@ -121,6 +123,13 @@ function RoomsPage() {
             </option>
           ))}
         </select>
+        <input
+          type="date"
+          value={attendanceDate}
+          onChange={(e) => setAttendanceDate(e.target.value)}
+          className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-ink outline-none focus:border-primary-500"
+          aria-label="Taariikhda room attendance"
+        />
       </div>
 
       {exams.length === 0 ? (
@@ -206,13 +215,13 @@ function RoomsPage() {
                                   {isAdmin && (
                                     <>
                                       <button
-                                        onClick={() => updateAssignment(s.enrollmentId, { examStatus: 'present' })}
+                                        onClick={() => updateAssignment(s.enrollmentId, { examStatus: 'present' }, attendanceDate)}
                                         className="rounded-md border border-border px-2 py-1 text-xs text-ink hover:bg-primary-50 hover:text-primary-600"
                                       >
                                         Present
                                       </button>
                                       <button
-                                        onClick={() => updateAssignment(s.enrollmentId, { examStatus: 'absent' })}
+                                        onClick={() => updateAssignment(s.enrollmentId, { examStatus: 'absent' }, attendanceDate)}
                                         className="rounded-md border border-border px-2 py-1 text-xs text-ink hover:bg-danger-50 hover:text-danger-500"
                                       >
                                         Absent
@@ -221,7 +230,7 @@ function RoomsPage() {
                                         <ArrowRightLeft size={14} className="text-ink-muted" />
                                         <select
                                           value={roomItems.find((r) => r.name === room)?.id ?? ''}
-                                          onChange={(e) => updateAssignment(s.enrollmentId, { roomId: e.target.value })}
+                                          onChange={(e) => updateAssignment(s.enrollmentId, { roomId: e.target.value }, attendanceDate)}
                                           className="rounded-md border border-border bg-surface px-2 py-1 text-xs text-ink outline-none focus:border-primary-500"
                                         >
                                           {roomItems.map((r) => (
@@ -261,7 +270,7 @@ function RoomsPage() {
                       {isAdmin && roomItems.length > 0 && (
                         <select
                           value=""
-                          onChange={(e) => updateAssignment(s.enrollmentId, { roomId: e.target.value })}
+                          onChange={(e) => updateAssignment(s.enrollmentId, { roomId: e.target.value }, attendanceDate)}
                           className="rounded-md border border-border bg-surface px-2 py-1 text-xs text-ink outline-none focus:border-primary-500"
                         >
                           <option value="" disabled>
