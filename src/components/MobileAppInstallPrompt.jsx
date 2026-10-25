@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Download, ShieldCheck, Smartphone, X } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 
-const APK_URL = 'https://expo.dev/artifacts/eas/9kD1fokAin0Kbz1kn_lDevT5hQTIQT5G8FAKcawa_-k.apk'
+const APK_URL = 'https://expo.dev/artifacts/eas/8JHItf1nviMR_telPZnMY3OLMhKR4bU3gOer7jTc59g.apk'
 
 // This is deliberately shown only after staff enter the private system. The
 // first click only opens instructions; the APK is never downloaded silently.
