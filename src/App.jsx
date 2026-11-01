@@ -41,6 +41,7 @@ import SignupPage from './pages/SignupPage'
 import OwnerDashboardPage from '@/pages/OwnerDashboardPage'
 import OwnersPage from '@/pages/OwnersPage'
 import OwnerLayout from './layouts/OwnerLayout'
+import { PwaInstallPrompt, PwaUpdatePrompt } from '@/components/PwaExperience'
 // Providers-ka xogta (backend + mock ilaa la isku xiro) dhammaantood waa in ay ka sarreeyaan Routes-ka,
 // si xogtu u wadaagto pages-ka oo dhan (Students, Attendance, Fees, Exam
 // results) — ma aha mid kasta oo state gaar ah leh.
@@ -180,6 +181,8 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <Shell />
+        <PwaInstallPrompt />
+        <PwaUpdatePrompt />
       </AuthProvider>
     </ThemeProvider>
   )

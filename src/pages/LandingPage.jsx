@@ -6,7 +6,6 @@ import {
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import ThemeToggle from '@/components/ThemeToggle'
-import MobileAppInstallPrompt from '@/components/MobileAppInstallPrompt'
 import brandMark from '@/assets/brand-mark.png'
 
 const navItems = [
@@ -76,7 +75,6 @@ function LandingPage() {
       <section className="px-5 pb-20 sm:px-8 sm:pb-28"><div id="apply" className="mx-auto max-w-7xl scroll-mt-24 overflow-hidden rounded-[34px] bg-gradient-to-br from-emerald-700 via-emerald-600 to-cyan-700 px-6 py-12 text-white shadow-2xl shadow-emerald-900/20 sm:px-10 sm:py-14 lg:px-14"><div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between"><div className="max-w-2xl"><p className="text-xs font-black uppercase tracking-[.18em] text-emerald-100">Diyaar ma tahay?</p><h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Iskuulkaaga ku diiwaangeli bilaash.</h2><p className="mt-4 text-base leading-7 text-white/85">Register your school, kadibna waxaan samaynaynaa review si account ammaan ah oo bilaash ah loogu diyaariyo iskuulkaaga.</p></div><div className="flex flex-col gap-3 sm:flex-row lg:flex-col"><Link to="/signup" className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-6 py-3.5 text-sm font-black text-emerald-700 shadow-lg transition hover:-translate-y-0.5 hover:bg-emerald-50">Register your school<ArrowRight size={17} /></Link><Link to="/login" className="inline-flex items-center justify-center rounded-2xl border border-white/30 px-6 py-3.5 text-sm font-bold text-white transition hover:bg-white/10">Akoon ma leedahay? Login</Link></div></div></div></section>
     </main>
     <footer className="border-t border-slate-200 py-8 dark:border-white/10"><div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 text-center sm:px-8 md:flex-row md:items-center md:justify-between md:text-left lg:px-10"><Brand /><p className="text-xs text-slate-500 dark:text-slate-400">© {new Date().getFullYear()} IskuulCaawiye. All rights reserved.</p><div className="flex justify-center gap-4 text-xs font-semibold text-slate-500 dark:text-slate-400"><Link to="/login">Login</Link><Link to="/signup">Register</Link></div></div></footer>
-    <MobileAppInstallPrompt landing />
   </div>
 }
 
