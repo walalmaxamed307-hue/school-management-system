@@ -1,17 +1,19 @@
 import { useEffect, useState } from 'react'
 import {
   ArrowRight, BarChart3, BookOpen, CalendarCheck2, Check,
-  ClipboardList, Crown, GraduationCap, Menu, School, ShieldCheck, Sparkles,
+  ClipboardList, Crown, GraduationCap, Menu, MessageCircle, School, Send, ShieldCheck, Sparkles,
   Users, WalletCards, X,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import ThemeToggle from '@/components/ThemeToggle'
 import brandMark from '@/assets/brand-mark.png'
+import { whatsappLink } from '@/lib/contact'
 
 const navItems = [
   { label: 'features', href: '#features' },
   { label: 'Roles', href: '#roles' },
   { label: '100% Bilaash', href: '#pricing' },
+  { label: 'Nala soo xiriir', href: '#contact' },
 ]
 
 const features = [
@@ -28,6 +30,13 @@ const roles = [
   { icon: GraduationCap, title: 'Macalin', color: 'text-blue-600 bg-blue-50', body: 'Qalabka shaqada maalinlaha ah.', items: ['Attendance iyo natiijooyin', 'Casharro & assignments', 'Ogeysiisyo iyo exam rooms'] },
   { icon: Sparkles, title: 'Arday', color: 'text-violet-600 bg-violet-50', body: 'Helitaan cad oo u gaar ah.', items: ['Natiijooyin la publish-gareeyay', 'Lessons & assignments', 'Ogeysiisyo iyo exam room'] },
   { icon: Crown, title: 'Owner', color: 'text-amber-600 bg-amber-50', body: 'Muuqaal kooban oo akhris-kaliya ah.', items: ['Attendance iyo fees insights', 'Risk students', 'Xaaladda guud ee iskuulka'] },
+]
+
+const partnerSchools = [
+  { name: 'AmirNUR Secondary', initials: 'AN', tone: 'from-blue-600 to-indigo-700' },
+  { name: 'Hurbad Primary', initials: 'HP', tone: 'from-emerald-500 to-teal-700' },
+  { name: 'Al-Miftaax College', initials: 'AM', tone: 'from-amber-500 to-orange-700' },
+  { name: 'Hilwa Primary & Secondary', initials: 'HS', tone: 'from-violet-600 to-fuchsia-700' },
 ]
 
 function scrollToSection(event, href, onDone) {
@@ -51,6 +60,44 @@ function DashboardPreview() {
   </div>
 }
 
+function PartnerSchools() {
+  const schools = [...partnerSchools, ...partnerSchools]
+  return <section className="overflow-hidden border-y border-slate-200 bg-slate-950 py-10 text-white dark:border-white/10"><div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10"><div className="flex flex-col gap-2 text-center sm:flex-row sm:items-end sm:justify-between sm:text-left"><div><p className="text-xs font-black uppercase tracking-[.18em] text-emerald-300">Iskuulada isticmaala Nidaamkaan</p><h2 className="mt-2 text-xl font-black tracking-tight sm:text-2xl"></h2></div><p className="text-sm text-slate-300">Nidaam ay ku maamulaan waxbarashadooda maalin kasta.</p></div></div><div className="mt-7 flex w-max gap-4 landing-school-marquee">{schools.map((school, index) => <article key={`${school.name}-${index}`} className="flex min-w-[245px] items-center gap-3 rounded-2xl border border-white/10 bg-white/[.07] px-4 py-3.5 shadow-lg shadow-black/10 backdrop-blur"><span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${school.tone} text-sm font-black text-white shadow-lg`}>{school.initials}</span><div className="min-w-0"><p className="text-[10px] font-bold uppercase tracking-[.15em] text-emerald-200">Iskuul isticmaala</p><p className="mt-0.5 truncate text-sm font-extrabold text-white">{school.name}</p></div></article>)}</div></section>
+}
+
+function ContactSection() {
+  const [status, setStatus] = useState('idle')
+  const [error, setError] = useState('')
+
+  const submit = async (event) => {
+    event.preventDefault()
+    const endpoint = import.meta.env.VITE_FORMSPREE_ENDPOINT
+    const form = event.currentTarget
+
+    if (!endpoint) {
+      setError('Form-ka wali lama xiriirin. Fadlan WhatsApp nala soo xiriir.')
+      return
+    }
+
+    setStatus('sending')
+    setError('')
+    const data = new FormData(form)
+    data.set('_subject', `Farriin cusub oo IskuulCaawiye ah: ${data.get('Magaca')}`)
+
+    try {
+      const response = await fetch(endpoint, { method: 'POST', headers: { Accept: 'application/json' }, body: data })
+      if (!response.ok) throw new Error('Contact submission failed')
+      form.reset()
+      setStatus('success')
+    } catch {
+      setStatus('idle')
+      setError('Farriinta lama dirin. Hubi internet-kaaga ama WhatsApp nala soo xiriir.')
+    }
+  }
+
+  return <section id="contact" className="scroll-mt-24 bg-slate-950 px-5 py-20 text-white sm:px-8 sm:py-28"><div className="mx-auto grid max-w-6xl gap-9 lg:grid-cols-[.84fr_1.16fr] lg:items-center"><div><p className="text-xs font-black uppercase tracking-[.18em] text-emerald-300">Nala soo xiriir</p><h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Su'aal ma qabtaa? Waan ku caawinaynaa.</h2><p className="mt-4 max-w-xl text-base leading-7 text-slate-300">Noo reeb farriin, kooxdayaduna waxay kuugu soo jawaabi doonaan sida ugu dhakhsaha badan. Waxaad sidoo kale si toos ah nagala soo xiriiri kartaa WhatsApp.</p><a href={whatsappLink('Asc. Waxaan rabaa inaan wax badan ka ogaado IskuulCaawiye.')} target="_blank" rel="noopener noreferrer" className="mt-7 inline-flex min-h-[52px] items-center gap-2 rounded-2xl bg-emerald-500 px-5 py-3 text-sm font-extrabold text-white shadow-lg shadow-emerald-950/20 transition hover:-translate-y-0.5 hover:bg-emerald-400"><MessageCircle size={18} /> WhatsApp nala soo xiriir <ArrowRight size={17} /></a></div><div className="rounded-[28px] border border-white/10 bg-white/[.06] p-5 shadow-2xl backdrop-blur sm:p-7"><p className="text-sm font-extrabold text-white">Noo dir farriin</p><p className="mt-1 text-sm text-slate-300">Dhammaan meelaha calaamadda leh waa muhiim.</p>{status === 'success' ? <div className="mt-6 rounded-2xl border border-emerald-300/25 bg-emerald-400/10 p-5"><p className="font-extrabold text-emerald-200">Farriintaada waa la diray.</p><p className="mt-1 text-sm leading-6 text-slate-300">Waad mahadsan tahay. Waxaan kula soo xiriiri doonnaa sida ugu dhakhsaha badan.</p><button type="button" onClick={() => setStatus('idle')} className="mt-4 text-sm font-bold text-emerald-300 hover:text-emerald-200">Dir farriin kale</button></div> : <form onSubmit={submit} className="mt-6 space-y-4"><div className="grid gap-4 sm:grid-cols-2"><label className="block text-sm font-bold text-slate-100">Magacaaga<input required name="Magaca" placeholder="Magaca oo buuxa" className="mt-2 block w-full rounded-xl border border-white/10 bg-slate-950/45 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500 focus:border-emerald-400 focus:ring-4 focus:ring-emerald-400/10" /></label><label className="block text-sm font-bold text-slate-100">Email-ka<input required type="email" name="Email" placeholder="email@example.com" className="mt-2 block w-full rounded-xl border border-white/10 bg-slate-950/45 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500 focus:border-emerald-400 focus:ring-4 focus:ring-emerald-400/10" /></label></div><label className="block text-sm font-bold text-slate-100">Taleefan / WhatsApp<input required type="tel" name="Taleefan" placeholder="+252 ..." className="mt-2 block w-full rounded-xl border border-white/10 bg-slate-950/45 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500 focus:border-emerald-400 focus:ring-4 focus:ring-emerald-400/10" /></label><label className="block text-sm font-bold text-slate-100">Farriintaada<textarea required name="Farriin" rows="4" placeholder="Maxaan kaa caawin karnaa?" className="mt-2 block w-full resize-y rounded-xl border border-white/10 bg-slate-950/45 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500 focus:border-emerald-400 focus:ring-4 focus:ring-emerald-400/10" /></label>{error && <p role="alert" className="rounded-xl bg-red-500/10 px-4 py-3 text-sm font-semibold text-red-200">{error}</p>}<button disabled={status === 'sending'} type="submit" className="inline-flex min-h-[52px] w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-5 py-3 text-sm font-extrabold text-white shadow-lg shadow-emerald-950/20 transition hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-70">{status === 'sending' ? 'Farriinta waa la dirayaa...' : <>Dir farriinta <Send size={17} /></>}</button></form>}</div></div></section>
+}
+
 function LandingPage() {
   const [menuOpen, setMenuOpen] = useState(false)
   useEffect(() => { const escape = (event) => event.key === 'Escape' && setMenuOpen(false); window.addEventListener('keydown', escape); return () => window.removeEventListener('keydown', escape) }, [])
@@ -66,6 +113,10 @@ function LandingPage() {
 
       <section className="border-y border-slate-200 bg-white/65 py-10 dark:border-white/10 dark:bg-white/[.025]"><div className="mx-auto grid max-w-7xl gap-5 px-5 sm:grid-cols-3 sm:px-8 lg:px-10">{[['Fudud in la barto', 'Interface nadiif ah oo shaqada kuu fududeynaya.'], ['Xog cad', 'Waxa muhiimka ah waxaad ka aragtaa hal dashboard.'], ['Arday ku xiran', 'Natiijo, cashar iyo ogeysiis si toos ah u hela.']].map(([title, body], index) => <div key={title} className="flex items-start gap-3"><span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-xs font-black text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">0{index + 1}</span><div><p className="text-sm font-extrabold text-slate-900 dark:text-white">{title}</p><p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">{body}</p></div></div>)}</div></section>
 
+      <PartnerSchools />
+
+     
+
       <section id="features" className="scroll-mt-24 py-22 sm:py-28"><div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10"><div className="max-w-2xl"><p className="text-xs font-black uppercase tracking-[.18em] text-emerald-600">Waxa systemku qabanayo</p><h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl dark:text-white">Waxa iskuulka u baahan yahay, hab isku xiran.</h2><p className="mt-4 text-base leading-7 text-slate-600 dark:text-slate-300">Qayb kasta waxaa loo dhisay in shaqada maamulka iyo waxbarashadu noqoto mid sahlan, la isku halayn karo, oo la raadin karo.</p></div><div className="mt-11 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{features.map((feature, index) => { const Icon = feature.icon; return <article key={feature.title} className="landing-feature group rounded-3xl border border-slate-200 bg-white p-6 dark:border-white/10 dark:bg-white/[.035]"><div className="flex items-start justify-between"><span className="rounded-2xl bg-emerald-50 p-3 text-emerald-700 transition group-hover:scale-105 dark:bg-emerald-500/10 dark:text-emerald-300"><Icon size={21} /></span><span className="text-xs font-black text-slate-300 dark:text-white/20">0{index + 1}</span></div><h3 className="mt-5 text-lg font-extrabold text-slate-950 dark:text-white">{feature.title}</h3><p className="mt-2 text-sm leading-6 text-slate-500 dark:text-slate-400">{feature.body}</p></article> })}</div></div></section>
 
       <section id="roles" className="scroll-mt-24 bg-slate-950 py-22 text-white sm:py-28"><div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10"><div className="max-w-2xl"><p className="text-xs font-black uppercase tracking-[.18em] text-emerald-300">Role-based access</p><h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Qof walba wuxuu helayaa waxa shaqadiisu u baahan tahay.</h2><p className="mt-4 text-base leading-7 text-slate-300">Systemku ma isku wada mid aha: admin, macalin, arday iyo owner mid walba wuxuu helayaa dashboard iyo awood ku habboon.</p></div><div className="mt-11 grid gap-4 md:grid-cols-2 xl:grid-cols-4">{roles.map((role) => { const Icon = role.icon; return <article key={role.title} className="rounded-3xl border border-white/10 bg-white/[.055] p-6 transition hover:-translate-y-1 hover:bg-white/[.08]"><span className={`inline-flex rounded-2xl p-3 ${role.color}`}><Icon size={21} /></span><h3 className="mt-5 text-lg font-extrabold">{role.title}</h3><p className="mt-1 text-sm text-white/60">{role.body}</p><ul className="mt-5 space-y-3">{role.items.map((item) => <li key={item} className="flex gap-2 text-xs leading-5 text-slate-300"><Check size={15} className="mt-0.5 shrink-0 text-emerald-300" />{item}</li>)}</ul></article> })}</div></div></section>
@@ -74,6 +125,7 @@ function LandingPage() {
 
       <section className="px-5 pb-20 sm:px-8 sm:pb-28"><div id="apply" className="mx-auto max-w-7xl scroll-mt-24 overflow-hidden rounded-[34px] bg-gradient-to-br from-emerald-700 via-emerald-600 to-cyan-700 px-6 py-12 text-white shadow-2xl shadow-emerald-900/20 sm:px-10 sm:py-14 lg:px-14"><div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between"><div className="max-w-2xl"><p className="text-xs font-black uppercase tracking-[.18em] text-emerald-100">Diyaar ma tahay?</p><h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Iskuulkaaga ku diiwaangeli bilaash.</h2><p className="mt-4 text-base leading-7 text-white/85">Register your school, kadibna waxaan samaynaynaa review si account ammaan ah oo bilaash ah loogu diyaariyo iskuulkaaga.</p></div><div className="flex flex-col gap-3 sm:flex-row lg:flex-col"><Link to="/signup" className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-6 py-3.5 text-sm font-black text-emerald-700 shadow-lg transition hover:-translate-y-0.5 hover:bg-emerald-50">Register your school<ArrowRight size={17} /></Link><Link to="/login" className="inline-flex items-center justify-center rounded-2xl border border-white/30 px-6 py-3.5 text-sm font-bold text-white transition hover:bg-white/10">Akoon ma leedahay? Login</Link></div></div></div></section>
     </main>
+     <ContactSection />
     <footer className="border-t border-slate-200 py-8 dark:border-white/10"><div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 text-center sm:px-8 md:flex-row md:items-center md:justify-between md:text-left lg:px-10"><Brand /><p className="text-xs text-slate-500 dark:text-slate-400">© {new Date().getFullYear()} IskuulCaawiye. All rights reserved.</p><div className="flex justify-center gap-4 text-xs font-semibold text-slate-500 dark:text-slate-400"><Link to="/login">Login</Link><Link to="/signup">Register</Link></div></div></footer>
   </div>
 }

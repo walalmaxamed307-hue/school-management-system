@@ -1,6 +1,6 @@
 import { Outlet, useNavigate, NavLink } from 'react-router-dom'
-import { BookOpen, DoorOpen, FileText, LogOut, Megaphone, Menu, UserRound, X } from 'lucide-react'
-import { useState } from 'react'
+import { ArrowUpRight, BookOpen, DoorOpen, FileText, LogOut, Megaphone, Menu, UserRound, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import ThemeToggle from '@/components/ThemeToggle'
 import SchoolLogo from '@/components/SchoolLogo'
@@ -12,6 +12,25 @@ const links = [
   { to: '/my-announcements', label: 'Ogeysiisyo', icon: Megaphone },
   { to: '/my-room', label: 'Qolka Imtixaanka', icon: DoorOpen },
 ]
+
+// Beddel qoraallada iyo link-ga hoose marka affiliate-kaaga diyaar yahay.
+const AFFILIATE_LINK = 'https://www.awin1.com/cread.php?awinmid=126991&awinaffid=2990203&ued=https%3A%2F%2Fwww.storeclaw.ai%2F'
+const studentAds = [
+  'samee vedios AI oo qurux badan adigoo qarash bixin oo lacag ka hel',
+  'bilow ganacsigaaga ugu horeeya hab online ah💻',
+  'AI ugu fiican sawir hagaajinta 100% waa bilaash',
+]
+
+function StudentAffiliateBanner() {
+  const [activeAd, setActiveAd] = useState(0)
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setActiveAd((current) => (current + 1) % studentAds.length), 4500)
+    return () => window.clearInterval(timer)
+  }, [])
+
+  return <a href={AFFILIATE_LINK} target="_blank" rel="sponsored noopener noreferrer" className="student-affiliate-banner no-print group mt-6 flex items-center justify-between gap-4 overflow-hidden rounded-2xl border border-primary-100 bg-gradient-to-r from-primary-50 via-surface to-emerald-50 px-4 py-3.5 transition hover:-translate-y-0.5 hover:border-primary-300 hover:shadow-lg dark:border-primary-500/25 dark:from-primary-500/10 dark:via-surface dark:to-emerald-500/10"><div className="min-w-0"><p className="text-[10px] font-bold uppercase tracking-[.16em] text-primary-600">Xayeysiis</p><p key={activeAd} className="student-affiliate-copy mt-0.5 truncate text-sm font-extrabold text-ink">{studentAds[activeAd]}</p></div><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary-600 text-white shadow-sm transition group-hover:scale-105"><ArrowUpRight size={17} /></span></a>
+}
 
 function StudentLayout() {
   const { user, logout } = useAuth()
@@ -58,6 +77,7 @@ function StudentLayout() {
           </div>
         </section>
         <Outlet />
+        <StudentAffiliateBanner />
       </main>
     </div>
   )

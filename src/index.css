@@ -129,6 +129,8 @@ body {
 @keyframes landing-float-two { 0%, 100% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(-28px, 26px, 0) scale(.94); } }
 @keyframes landing-reveal { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes landing-bar { from { transform: scaleY(.35); } to { transform: scaleY(1); } }
+@keyframes landing-school-scroll { from { transform: translateX(0); } to { transform: translateX(calc(-50% - .5rem)); } }
+@keyframes student-affiliate-enter { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
 .landing-page { background-image: linear-gradient(to bottom, rgba(236,253,245,.38), transparent 42rem); }
 .landing-orb { pointer-events: none; position: absolute; border-radius: 999px; filter: blur(46px); }
 .landing-orb-one { left: -8rem; top: 6rem; height: 22rem; width: 22rem; background: rgba(16,185,129,.16); animation: landing-float-one 14s ease-in-out infinite; }
@@ -140,6 +142,10 @@ body {
 .landing-feature { transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
 .landing-feature:hover { transform: translateY(-5px); border-color: color-mix(in srgb, var(--color-primary-100) 92%, var(--color-border)); box-shadow: 0 18px 38px rgba(15,23,42,.08); }
 .landing-menu { transition: opacity .22s ease; }
+.landing-school-marquee { animation: landing-school-scroll 28s linear infinite; }
+.landing-school-marquee:hover { animation-play-state: paused; }
+.student-affiliate-banner { min-height: 64px; }
+.student-affiliate-copy { animation: student-affiliate-enter .35s ease both; }
 
 .dark .landing-page { background-image: radial-gradient(circle at 14% 0%, rgba(16,185,129,.13), transparent 28rem), #07111b; }
 .dark .landing-feature:hover { box-shadow: 0 18px 38px rgba(0,0,0,.2); }
@@ -151,7 +157,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .login-bubble, .login-bubble-alt, .login-glass::after, .login-tab-active, .landing-orb-one, .landing-orb-two, .landing-reveal, .landing-preview, .landing-chart-bar { animation: none; }
+  .login-bubble, .login-bubble-alt, .login-glass::after, .login-tab-active, .landing-orb-one, .landing-orb-two, .landing-reveal, .landing-preview, .landing-chart-bar, .landing-school-marquee, .student-affiliate-copy { animation: none; }
 }
 
 /* Dark palette — kaliya CSS vars-ka ayaan bedelnay, component-yada wax kama
