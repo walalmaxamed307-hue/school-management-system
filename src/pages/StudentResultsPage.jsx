@@ -5,6 +5,20 @@ import { api } from '@/lib/api'
 import { useToast } from '@/hooks/useToast'
 import { Card, Button } from '@/components/ui'
 
+function gradeFromPercentage(percentage) {
+  if (percentage >= 95) return 'A+'
+  if (percentage >= 90) return 'A'
+  if (percentage >= 85) return 'A-'
+  if (percentage >= 80) return 'B+'
+  if (percentage >= 75) return 'B'
+  if (percentage >= 70) return 'B-'
+  if (percentage >= 65) return 'C+'
+  if (percentage >= 60) return 'C'
+  if (percentage >= 55) return 'D'
+  if (percentage >= 50) return 'D-'
+  return 'F'
+}
+
 // Ardaygu wuxuu arki karaa kaliya exam-yada la publish gareeyay ee sanadka
 // HADDA socda (isla xeerka backend-ku, GET /my-results).
 function StudentResultsPage() {
@@ -86,6 +100,9 @@ function StudentResultsPage() {
   }
 
   const subjectRows = Object.entries(current.marks)
+  const grade = subjectRows.length > 0 && Number(current.maxMark) > 0
+    ? gradeFromPercentage((current.average / Number(current.maxMark)) * 100)
+    : '—'
 
   return (
     <div>
@@ -114,6 +131,10 @@ function StudentResultsPage() {
           <Card>
             <p className="text-xs text-ink-muted">Average</p>
             <p className="text-lg font-medium text-ink">{current.average.toFixed(1)}</p>
+          </Card>
+          <Card>
+            <p className="text-xs text-ink-muted">Grade</p>
+            <p className="text-lg font-medium text-primary-600">{grade}</p>
           </Card>
           <Card>
             <p className="text-xs text-ink-muted">Kaalinta fasalka</p>

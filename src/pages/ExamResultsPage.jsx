@@ -13,6 +13,83 @@ function selectClass() {
   return 'rounded-lg border border-border bg-surface px-3 py-2 text-sm text-ink outline-none focus:border-primary-500'
 }
 
+function gradeFromPercentage(percentage) {
+  if (percentage >= 95) return 'A+'
+  if (percentage >= 90) return 'A'
+  if (percentage >= 85) return 'A-'
+  if (percentage >= 80) return 'B+'
+  if (percentage >= 75) return 'B'
+  if (percentage >= 70) return 'B-'
+  if (percentage >= 65) return 'C+'
+  if (percentage >= 60) return 'C'
+  if (percentage >= 55) return 'D'
+  if (percentage >= 50) return 'D-'
+  return 'F'
+}
+
+function resultSummary(row, combined, maxMark) {
+  const marks = combined ? row.combinedMarks : row.marks
+  const values = Object.values(marks ?? {})
+  if (values.length === 0 || !Number(maxMark)) return { average: null, grade: '—' }
+
+  const average = combined
+    ? values.reduce((sum, mark) => sum + (Number(mark) || 0), 0) / values.length
+    : Number(row.average ?? 0)
+  return { average, grade: gradeFromPercentage((average / Number(maxMark)) * 100) }
+}
+
+const gradeBands = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'D', 'D-', 'F']
+
+function ClassPerformanceSummary({ classRows, subjects, combined, maxMark }) {
+  const gradeCounts = Object.fromEntries(gradeBands.map((grade) => [grade, 0]))
+  let gradedStudents = 0
+
+  for (const row of classRows) {
+    const { average, grade } = resultSummary(row, combined, maxMark)
+    if (average === null) continue
+    gradeCounts[grade] += 1
+    gradedStudents += 1
+  }
+
+  const calculatedSubjects = subjects.map((subject) => {
+    const values = classRows
+      .map((row) => (combined ? row.combinedMarks : row.marks)?.[subject.id])
+      .filter((mark) => mark !== undefined && mark !== null && mark !== '')
+      .map(Number)
+    const total = values.reduce((sum, mark) => sum + mark, 0)
+    return {
+      ...subject,
+      studentsWithMarks: values.length,
+      total,
+      average: values.length > 0 ? total / values.length : null,
+      rank: null,
+    }
+  })
+
+  const ordered = calculatedSubjects
+    .filter((subject) => subject.average !== null)
+    .sort((a, b) => b.average - a.average)
+  let previousAverage = null
+  let rank = 0
+  ordered.forEach((subject, index) => {
+    if (subject.average !== previousAverage) rank = index + 1
+    subject.rank = rank
+    previousAverage = subject.average
+  })
+
+  return <section className="mt-5 space-y-4">
+    <Card className="overflow-x-auto p-0">
+      <div className="border-b border-border bg-canvas px-4 py-3"><p className="text-sm font-bold text-ink">Qaybinta Grade-ka</p><p className="mt-0.5 text-xs text-ink-muted">{gradedStudents} arday oo leh natiijo ayaa la qiimeeyay.</p></div>
+      <table className="w-full min-w-max text-xs md:text-sm"><tbody><tr className="border-b border-border"><th className="bg-canvas px-3 py-2 text-left font-medium text-ink-muted">Grade</th>{gradeBands.map((grade) => <th key={grade} className="px-3 py-2 text-center font-medium text-ink-muted">{grade}</th>)}</tr><tr><th className="bg-canvas px-3 py-2 text-left font-medium text-ink-muted">Tirada ardayda</th>{gradeBands.map((grade) => <td key={grade} className="px-3 py-2 text-center font-bold text-ink">{gradeCounts[grade]}</td>)}</tr></tbody></table>
+    </Card>
+
+    <Card className="overflow-x-auto p-0">
+      <div className="border-b border-border bg-canvas px-4 py-3"><p className="text-sm font-bold text-ink">Falanqaynta maadooyinka</p><p className="mt-0.5 text-xs text-ink-muted">Celceliska maado kasta wuxuu ka reebayaa arday aan wali dhibco loo gelin maadadaas.</p></div>
+      <table className="w-full min-w-max text-xs md:text-sm"><thead><tr className="border-b border-border bg-canvas"><th className="px-3 py-2 text-left font-medium text-ink-muted">Maadada</th>{calculatedSubjects.map((subject) => <th key={subject.id} className="px-3 py-2 text-center font-medium text-ink-muted">{subject.name}</th>)}</tr></thead><tbody><tr className="border-b border-border"><th className="whitespace-nowrap bg-surface px-3 py-2 text-left font-medium text-ink-muted">Wadarta dhibcaha</th>{calculatedSubjects.map((subject) => <td key={subject.id} className="px-3 py-2 text-center font-medium text-ink">{subject.studentsWithMarks ? subject.total : '—'}</td>)}</tr><tr className="border-b border-border"><th className="whitespace-nowrap bg-surface px-3 py-2 text-left font-medium text-ink-muted">Celceliska maadada</th>{calculatedSubjects.map((subject) => <td key={subject.id} className="px-3 py-2 text-center font-medium text-ink">{subject.average === null ? '—' : subject.average.toFixed(1)}</td>)}</tr><tr><th className="whitespace-nowrap bg-surface px-3 py-2 text-left font-medium text-ink-muted">Kaalinta maadada</th>{calculatedSubjects.map((subject) => <td key={subject.id} className="px-3 py-2 text-center font-bold text-primary-600">{subject.rank === null ? '—' : `#${subject.rank}`}</td>)}</tr></tbody></table>
+    </Card>
+  </section>
+}
+
 function ExamResultsPage() {
   const { classes } = useClasses()
   const { subjectItems } = useSubjects()
@@ -322,6 +399,8 @@ function ExamResultsPage() {
                       {subj.name}{showCombinedPartResults ? ' (P1+P2)' : ''}
                     </th>
                   ))}
+                  <th className="whitespace-nowrap px-2 py-2 font-medium md:px-4 md:py-3 text-ink-muted">Average</th>
+                  <th className="whitespace-nowrap px-2 py-2 font-medium md:px-4 md:py-3 text-ink-muted">Grade</th>
                   <th className="whitespace-nowrap px-2 py-2 font-medium md:px-4 md:py-3 text-ink-muted">{showCombinedPartResults ? 'Total (P1+P2)' : hasParts ? `Part ${selectedPart} total` : 'Total'}</th>
                   <th className="whitespace-nowrap px-2 py-2 font-medium md:px-4 md:py-3 text-ink-muted">Kaalinta</th>
                   {isFinal && (!hasParts || selectedPart === '2') && <th className="whitespace-nowrap px-2 py-2 font-medium md:px-4 md:py-3 text-ink-muted">Xaalad</th>}
@@ -330,13 +409,14 @@ function ExamResultsPage() {
               <tbody>
                 {rows.length === 0 && (
                   <tr>
-                    <td colSpan={subjectItems.length + (isFinal && (!hasParts || selectedPart === '2') ? 4 : 3)} className="px-4 py-8 text-center text-ink-muted">
+                    <td colSpan={subjectItems.length + (isFinal && (!hasParts || selectedPart === '2') ? 6 : 5)} className="px-4 py-8 text-center text-ink-muted">
                       {resultsLoading ? 'Waa la soo rarayaa...' : 'Fasalkan arday kuma jiro'}
                     </td>
                   </tr>
                 )}
-                {rows.map((row) => (
-                  <tr key={row.enrollmentId} className="border-b border-border last:border-0">
+                {rows.map((row) => {
+                  const summary = resultSummary(row, showCombinedPartResults, showCombinedPartResults ? results?.exam?.examMaxMark : maxMark)
+                  return <tr key={row.enrollmentId} className="border-b border-border last:border-0">
                     <td className="sticky left-0 z-10 whitespace-nowrap bg-surface px-2 py-1.5 text-ink md:px-4 md:py-2">
                       <span className="flex items-center gap-1.5">
                         {row.name}
@@ -375,6 +455,8 @@ function ExamResultsPage() {
                         )}
                       </td>
                     ))}
+                    <td className="px-2 py-1.5 md:px-4 md:py-2"><span className="inline-flex min-w-14 justify-center rounded-md bg-canvas px-2 py-1 font-medium text-ink">{summary.average === null ? '—' : summary.average.toFixed(1)}</span></td>
+                    <td className="px-2 py-1.5 md:px-4 md:py-2"><span className="inline-flex min-w-12 justify-center rounded-md bg-primary-50 px-2 py-1 font-bold text-primary-700">{summary.grade}</span></td>
                     <td className="px-2 py-1.5 font-medium text-ink md:px-4 md:py-2">{showCombinedPartResults ? row.combinedTotal : row.total}</td>
                     <td className="px-2 py-1.5 text-ink md:px-4 md:py-2">#{showCombinedPartResults ? row.combinedRank : row.rank}</td>
                     {isFinal && (!hasParts || selectedPart === '2') && (
@@ -389,10 +471,17 @@ function ExamResultsPage() {
                       </td>
                     )}
                   </tr>
-                ))}
+                })}
               </tbody>
             </table>
           </Card>
+
+          <ClassPerformanceSummary
+            classRows={results?.rows ?? []}
+            subjects={subjectItems}
+            combined={showCombinedPartResults}
+            maxMark={showCombinedPartResults ? results?.exam?.examMaxMark : maxMark}
+          />
 
         </>
       )}
