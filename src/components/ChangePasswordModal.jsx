@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
 import { Button, Input, Modal } from '@/components/ui'
@@ -47,7 +48,7 @@ function ChangePasswordModal({ open, onClose }) {
     close()
   }
 
-  return (
+  const content = (
     <Modal open={open} onClose={close} title="Beddel password-ka" size="sm">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <Input
@@ -86,6 +87,11 @@ function ChangePasswordModal({ open, onClose }) {
       </form>
     </Modal>
   )
+
+  // Header-ku wuxuu leeyahay stacking layer u gaar ah. Portal-ku wuxuu
+  // password dialog-ka si toos ah ugu ridaa body-ga, si overlay-ga iyo
+  // form-ka oo dhan ay uga muuqdaan desktop iyo mobile.
+  return createPortal(content, document.body)
 }
 
 export default ChangePasswordModal
