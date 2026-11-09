@@ -7,13 +7,15 @@ import { X } from 'lucide-react'
 function Modal({ open, onClose, title, children, size = 'md' }) {
   if (!open) return null
 
+  const compact = size === 'sm'
+
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center sm:p-4"
+      className={`fixed inset-0 z-50 flex justify-center bg-black/40 ${compact ? 'items-center p-3 sm:p-4' : 'items-end sm:items-center sm:p-4'}`}
       onClick={onClose}
     >
       <div
-        className={`flex h-[92vh] w-full flex-col rounded-t-2xl bg-surface p-5 sm:h-auto sm:max-h-[90vh] ${size === 'lg' ? 'sm:max-w-2xl' : 'sm:max-w-md'} sm:rounded-xl sm:p-6`}
+        className={`flex w-full flex-col bg-surface ${compact ? 'max-h-[calc(100dvh-1.5rem)] max-w-md rounded-2xl p-5 shadow-2xl sm:p-6' : `h-[92vh] rounded-t-2xl p-5 sm:h-auto sm:max-h-[90vh] ${size === 'lg' ? 'sm:max-w-2xl' : 'sm:max-w-md'} sm:rounded-xl sm:p-6`}`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex shrink-0 items-center justify-between">

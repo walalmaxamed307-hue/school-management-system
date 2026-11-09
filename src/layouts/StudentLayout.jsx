@@ -1,5 +1,5 @@
 import { Outlet, useNavigate, NavLink } from 'react-router-dom'
-import { ArrowUpRight, BookOpen, DoorOpen, FileText, LogOut, Megaphone, Menu, UserRound, X } from 'lucide-react'
+import { ArrowUpRight, BookOpen, Clapperboard, DoorOpen, FileText, Image, LogOut, Megaphone, Menu, Rocket, UserRound, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import ThemeToggle from '@/components/ThemeToggle'
@@ -16,20 +16,22 @@ const links = [
 // Beddel qoraallada iyo link-ga hoose marka affiliate-kaaga diyaar yahay.
 const AFFILIATE_LINK = 'https://www.awin1.com/cread.php?awinmid=126991&awinaffid=2990203&ued=https%3A%2F%2Fwww.storeclaw.ai%2F'
 const studentAds = [
-  'samee vedios AI oo qurux badan adigoo qarash bixin oo lacag ka hel',
-  'bilow ganacsigaaga ugu horeeya hab online ah💻',
-  'AI ugu fiican sawir hagaajinta 100% waa bilaash',
+  { text: 'Samee videos AI oo qurux badan — lacag ka hel 🎬', icon: Clapperboard, tone: 'bg-violet-500' },
+  { text: 'Bilow ganacsigaaga ugu horreeya online 💻', icon: Rocket, tone: 'bg-emerald-500' },
+  { text: 'AI sawir hagaajin ah oo 100% bilaash 🖼️', icon: Image, tone: 'bg-sky-500' },
 ]
 
 function StudentAffiliateBanner() {
   const [activeAd, setActiveAd] = useState(0)
+  const ad = studentAds[activeAd]
+  const AdIcon = ad.icon
 
   useEffect(() => {
     const timer = window.setInterval(() => setActiveAd((current) => (current + 1) % studentAds.length), 4500)
     return () => window.clearInterval(timer)
   }, [])
 
-  return <a href={AFFILIATE_LINK} target="_blank" rel="sponsored noopener noreferrer" className="student-affiliate-banner no-print group mt-6 flex items-center justify-between gap-4 overflow-hidden rounded-2xl border border-primary-100 bg-gradient-to-r from-primary-50 via-surface to-emerald-50 px-4 py-3.5 transition hover:-translate-y-0.5 hover:border-primary-300 hover:shadow-lg dark:border-primary-500/25 dark:from-primary-500/10 dark:via-surface dark:to-emerald-500/10"><div className="min-w-0"><p className="text-[10px] font-bold uppercase tracking-[.16em] text-primary-600">Xayeysiis</p><p key={activeAd} className="student-affiliate-copy mt-0.5 truncate text-sm font-extrabold text-ink">{studentAds[activeAd]}</p></div><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary-600 text-white shadow-sm transition group-hover:scale-105"><ArrowUpRight size={17} /></span></a>
+  return <footer className="no-print mt-7 border-t border-border pt-5"><a href={AFFILIATE_LINK} target="_blank" rel="sponsored noopener noreferrer" className="student-affiliate-banner group flex items-center justify-between gap-3 overflow-hidden rounded-2xl border border-primary-100 bg-gradient-to-r from-primary-50 via-surface to-emerald-50 p-3.5 transition hover:-translate-y-0.5 hover:border-primary-300 hover:shadow-lg dark:border-primary-500/25 dark:from-primary-500/10 dark:via-surface dark:to-emerald-500/10"><span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white shadow-sm ${ad.tone}`}><AdIcon size={19} /></span><div className="min-w-0 flex-1"><p className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-[.16em] text-primary-600">✨ Fursad kuu gaar ah</p><p key={activeAd} className="student-affiliate-copy mt-0.5 text-sm font-extrabold leading-5 text-ink">{ad.text}</p></div><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary-600 text-white shadow-sm transition group-hover:scale-105"><ArrowUpRight size={17} /></span></a><p className="mt-3 text-center text-[11px] text-ink-muted">Xayeysiis · Riix si aad wax badan u ogaato</p></footer>
 }
 
 function StudentLayout() {

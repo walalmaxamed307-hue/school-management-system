@@ -48,7 +48,7 @@ function ChangePasswordModal({ open, onClose }) {
   }
 
   return (
-    <Modal open={open} onClose={close} title="Beddel password-ka">
+    <Modal open={open} onClose={close} title="Beddel password-ka" size="sm">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <Input
           id="cp-current"
