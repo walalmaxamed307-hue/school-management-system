@@ -188,7 +188,7 @@ body {
   .print-area * {
     visibility: visible;
   }
-  .print-area {
+  .print-area:not(.room-print-area) {
     position: absolute;
     top: 0;
     left: 0;
@@ -197,4 +197,24 @@ body {
   .no-print {
     display: none !important;
   }
+
+  .room-print-area,
+  .room-print-area * { visibility: visible; }
+  .room-print-area { display: block !important; position: absolute; top: 0; left: 0; width: 100%; color: #111; }
+  .room-print-sheet { break-after: page; page-break-after: always; padding: 12mm; }
+  .room-print-sheet:last-child { break-after: auto; page-break-after: auto; }
+  .room-print-header { display: flex; justify-content: space-between; gap: 1rem; margin-bottom: 7mm; border-bottom: 2px solid #111; padding-bottom: 4mm; }
+  .room-print-label { margin: 0; font-size: 9pt; font-weight: 700; letter-spacing: .12em; }
+  .room-print-header h1 { margin: 1mm 0 0; font-size: 20pt; }
+  .room-print-meta { text-align: right; font-size: 9pt; line-height: 1.5; }
+  .room-print-meta p { margin: 0; }
+  .room-print-table { width: 100%; border-collapse: collapse; font-size: 8pt; }
+  .room-print-table th, .room-print-table td { border: 1px solid #111; padding: 2.5mm 1.5mm; text-align: left; vertical-align: middle; }
+  .room-print-table th { background: #f2f2f2; font-weight: 700; text-align: center; }
+  .room-print-table td:first-child { width: 8mm; text-align: center; }
+  .room-print-table td:nth-child(2) { min-width: 38mm; }
+  .room-print-table td:nth-child(3) { min-width: 25mm; }
+  .room-print-mark-box { min-width: 15mm; height: 11mm; }
 }
+
+.room-print-area { display: none; }

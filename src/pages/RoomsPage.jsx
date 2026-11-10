@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Plus, X, Shuffle, ArrowRightLeft, ChevronDown, ChevronUp, Phone } from 'lucide-react'
+import { Plus, X, Shuffle, ArrowRightLeft, ChevronDown, ChevronUp, Phone, Printer } from 'lucide-react'
 import { useStudents } from '@/hooks/useStudents'
 import { useRooms } from '@/hooks/useRooms'
 import { useClasses } from '@/hooks/useClasses'
@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useSchoolSettings } from '@/hooks/useSchoolSettings'
 import { useSearch } from '@/hooks/useSearch'
 import { useToast } from '@/hooks/useToast'
+import { useSubjects } from '@/hooks/useSubjects'
 import { Card, Button, Input, Modal } from '@/components/ui'
 
 const examStatusStyle = {
@@ -16,9 +17,14 @@ const examStatusStyle = {
 }
 const today = () => new Date().toISOString().slice(0, 10)
 
+function RoomPrintSheet({ room, students, activeStudents, subjectItems, examName, attendanceDate }) {
+  return <section className="room-print-sheet"><header className="room-print-header"><div><p className="room-print-label">EXAM ROOM</p><h1>{room}</h1></div><div className="room-print-meta"><p>Exam: {examName || '—'}</p><p>Taariikh: {attendanceDate}</p><p>Ardayda: {students.length}</p></div></header><table className="room-print-table"><thead><tr><th>No.</th><th>Magaca ardayga</th><th>Fasalka</th>{subjectItems.map((subject) => <th key={subject.id}>{subject.name}</th>)}</tr></thead><tbody>{students.length === 0 ? <tr><td colSpan={subjectItems.length + 3}>Room-kan arday kuma jiro.</td></tr> : students.map((assignment, index) => { const student = activeStudents.find((item) => item.id === assignment.studentId); const className = [student?.class, student?.section].filter(Boolean).join(' · ') || '—'; return <tr key={assignment.enrollmentId}><td>{index + 1}</td><td>{assignment.name}</td><td>{className}</td>{subjectItems.map((subject) => <td key={subject.id} className="room-print-mark-box" aria-label={`${subject.name} mark box`} />)}</tr> })}</tbody></table></section>
+}
+
 function RoomsPage() {
   const { students } = useStudents()
   const { classes } = useClasses()
+  const { subjectItems } = useSubjects()
   const { rooms, roomItems, addRoom, removeRoom, split, splitLoading, loadSplit, splitClasses, updateAssignment, assignedEnrollmentIds } =
     useRooms()
   const { exams, loadExams } = useExamResults()
@@ -34,6 +40,8 @@ function RoomsPage() {
   const [pickedRooms, setPickedRooms] = useState([])
   const [examId, setExamId] = useState('')
   const [attendanceDate, setAttendanceDate] = useState(today())
+  const [printRoomNames, setPrintRoomNames] = useState([])
+  const [printRequested, setPrintRequested] = useState(false)
 
   // Qaybinta (split) waa mid exam-gaar ah — waa in la doortaa term/exam
   // marka hore, isla sanadka hadda socda.
@@ -53,8 +61,19 @@ function RoomsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [examId, attendanceDate])
 
+  useEffect(() => {
+    if (!printRequested || printRoomNames.length === 0) return undefined
+    const timer = window.setTimeout(() => { window.print(); setPrintRequested(false) }, 0)
+    return () => window.clearTimeout(timer)
+  }, [printRequested, printRoomNames])
+
   function toggleRoom(room) {
     setExpandedRooms((prev) => ({ ...prev, [room]: !prev[room] }))
+  }
+
+  function printRooms(roomNames) {
+    setPrintRoomNames(roomNames)
+    setPrintRequested(true)
   }
 
   const activeStudents = students.filter((s) => s.status === 'active')
@@ -138,14 +157,7 @@ function RoomsPage() {
         </Card>
       ) : (
         <>
-          {isAdmin && (
-            <div className="mb-4 flex justify-end">
-              <Button onClick={openPicker}>
-                <Shuffle size={16} />
-                Kala qaybi — {examName}
-              </Button>
-            </div>
-          )}
+          <div className="mb-4 flex flex-wrap justify-end gap-2"><Button variant="secondary" onClick={() => printRooms(rooms)} disabled={rooms.length === 0} className="no-print"><Printer size={16} />Print all rooms</Button>{isAdmin && <Button onClick={openPicker}><Shuffle size={16} />Kala qaybi — {examName}</Button>}</div>
 
           <div className="flex flex-col gap-3">
             {rooms.map((room) => {
@@ -182,6 +194,7 @@ function RoomsPage() {
 
                   {isOpen && (
                     <div className="border-t border-border px-5 py-4">
+                      <div className="mb-3 flex justify-end no-print"><Button variant="secondary" size="sm" onClick={() => printRooms([room])}><Printer size={15} />Print {room}</Button></div>
                       {splitLoading ? (
                         <p className="text-sm text-ink-muted">Waa la soo rarayaa...</p>
                       ) : roomStudents.length === 0 ? (
@@ -254,6 +267,8 @@ function RoomsPage() {
               )
             })}
           </div>
+
+          <div className="room-print-area">{printRoomNames.map((room) => <RoomPrintSheet key={room} room={room} students={split[room] ?? []} activeStudents={activeStudents} subjectItems={subjectItems} examName={examName} attendanceDate={attendanceDate} />)}</div>
 
           <div className="mt-4 flex flex-col gap-4">
             {unassigned.length > 0 && (
