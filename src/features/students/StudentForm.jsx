@@ -8,8 +8,10 @@ import { Button, Input } from '@/components/ui'
 function StudentForm({ defaultValues, classes, schools = [], onSubmit, onCancel, onTransfer }) {
   const isEdit = !!defaultValues
   const originalStatus = defaultValues?.status
-  // Ardayda transferred/graduated fasalkooda iyo xaaladdooda lama beddeli karo.
-  const locked = isEdit && originalStatus !== 'active' && originalStatus !== 'withdrawn'
+  // Arday la qalin-jabiyay wuxuu weli ka tirsan yahay iskuulka, sidaas darteed
+  // maamulka ayaa dib ugu celin kara active ama withdrawn haddii si khalad ah
+  // loogu calaamadeeyay. Wareejin dhab ah (transferred) oo keliya ayaa xiran.
+  const locked = isEdit && originalStatus === 'transferred'
   const classLocked = isEdit && originalStatus !== 'active'
 
   const {

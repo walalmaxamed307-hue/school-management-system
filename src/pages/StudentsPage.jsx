@@ -69,7 +69,6 @@ function StudentsPage() {
   const activeSectionFilter = selectedClassObj?.hasSections ? sectionFilter : 'all'
 
   const filtered = students.filter((s) => {
-    if (s.status === 'graduated') return false // qaybta Graduates ayay ku jiraan kaliya
     const matchesSearch = s.name.toLowerCase().includes(search.toLowerCase())
     const matchesClass = classFilter === 'all' || s.class === classFilter
     const matchesSection =
