@@ -447,6 +447,10 @@ function ExamResultsPage() {
                             }
                             value={row.marks[subj.id] ?? ''}
                             onChange={(e) => {
+                              if (e.target.value === '') {
+                                setMark(row.enrollmentId, subj.id, null)
+                                return
+                              }
                               const clamped = Math.max(0, Math.min(Number(e.target.value), maxMark))
                               setMark(row.enrollmentId, subj.id, clamped)
                             }}

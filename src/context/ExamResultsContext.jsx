@@ -98,7 +98,14 @@ export function ExamResultsProvider({ children }) {
         ? {
             ...prev,
             rows: prev.rows.map((r) =>
-              r.enrollmentId === enrollmentId ? { ...r, marks: { ...r.marks, [subjectId]: mark } } : r
+              r.enrollmentId === enrollmentId
+                ? {
+                    ...r,
+                    marks: mark === null
+                      ? Object.fromEntries(Object.entries(r.marks).filter(([id]) => id !== String(subjectId)))
+                      : { ...r.marks, [subjectId]: mark },
+                  }
+                : r
             ),
           }
         : prev
