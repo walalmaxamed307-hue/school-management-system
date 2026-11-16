@@ -134,6 +134,21 @@ export function ExamResultsProvider({ children }) {
     }
   }
 
+  async function editPublishedClass() {
+    if (!current) return false
+    try {
+      await api.post(`/exams/${current.examId}/unpublish`, {
+        classId: current.classId,
+        sectionId: current.sectionId,
+      })
+      await loadResults(current.examId, current.classId, current.sectionId, current.part)
+      return true
+    } catch (err) {
+      showToast(err.message, 'error')
+      return false
+    }
+  }
+
   return (
     <ExamResultsContext.Provider
       value={{
@@ -147,6 +162,7 @@ export function ExamResultsProvider({ children }) {
         loadResults,
         setMark,
         publishClass,
+        editPublishedClass,
       }}
     >
       {children}

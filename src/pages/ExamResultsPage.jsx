@@ -104,6 +104,7 @@ function ExamResultsPage() {
     loadResults,
     setMark,
     publishClass,
+    editPublishedClass,
   } = useExamResults()
   const { settings, academicYears } = useSchoolSettings()
   const { query } = useSearch()
@@ -161,7 +162,6 @@ function ExamResultsPage() {
   const selectedSectionId = selectedClassObj?.sectionItems.find((s) => s.name === selectedSection)?.id ?? null
   const [examId, setExamId] = useState('')
   const [infoStudent, setInfoStudent] = useState(null)
-  const [unlocked, setUnlocked] = useState(false)
   const [addTermOpen, setAddTermOpen] = useState(false)
   const [newTermName, setNewTermName] = useState('')
   const [newTermFinal, setNewTermFinal] = useState(false)
@@ -211,7 +211,6 @@ function ExamResultsPage() {
   useEffect(() => {
     if (examId && selectedClassObj && sectionOk) {
       loadResults(examId, selectedClassObj.id, selectedSectionId, selectedPart)
-      setUnlocked(false)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [examId, selectedClassObj?.id, selectedSectionId, sectionOk, selectedPart])
@@ -245,8 +244,11 @@ function ExamResultsPage() {
   }
 
   async function handlePublish() {
-    const ok = await publishClass()
-    if (ok) setUnlocked(false)
+    await publishClass()
+  }
+
+  async function handleEditPublished() {
+    await editPublishedClass()
   }
 
   const rows = (results?.rows ?? []).filter((r) => r.name.toLowerCase().includes(query.toLowerCase()))
@@ -258,7 +260,8 @@ function ExamResultsPage() {
   const canManageResults = (results?.canPublish ?? false) && isCurrentYear
   const canPublish = canManageResults
   const activePartPublished = hasParts && selectedPart === '1' ? partOnePublished : allPublished
-  const showCombinedPartResults = hasParts && selectedPart === '2' && allPublished && !unlocked
+  const needsRepublish = results?.requiresRepublish ?? false
+  const showCombinedPartResults = hasParts && selectedPart === '2' && allPublished
 
   return (
     <div>
@@ -443,7 +446,7 @@ function ExamResultsPage() {
                             disabled={
                               !canEditSubject(selectedClassObj.id, selectedSectionId, subj.id) ||
                               !isCurrentYear ||
-                              (row.published && !unlocked && (!hasParts || (selectedPart === '1' ? row.publishedPart >= 1 : row.publishedPart >= 2)))
+                              (row.published && (!hasParts || (selectedPart === '1' ? row.publishedPart >= 1 : row.publishedPart >= 2)))
                             }
                             value={row.marks[subj.id] ?? ''}
                             onChange={(e) => {
@@ -495,22 +498,23 @@ function ExamResultsPage() {
           {activePartPublished ? (
             <span className="flex items-center gap-1 text-sm font-medium text-primary-600">
               <CheckCircle2 size={16} /> {hasParts && selectedPart === '1' ? 'Part 1 waa la published — ardaydu way arki karaan' : 'waa la published'}
-              {unlocked && ' — hadda editable, republish marka aad dhammaysato'}
             </span>
           ) : (
             <span className="text-sm text-ink-muted">
-              {hasParts && selectedPart === '1'
+              {needsRepublish
+                ? 'Natiijada waa furan tahay — macallin kasta wuxuu saxayaa maadadiisa. Ardaydu ma arkaan ilaa Republish la taabto.'
+                : hasParts && selectedPart === '1'
                 ? 'Marka macalimiinta dhammaystiraan Part 1, fasalka horjoogaha ayaa publish gareeya si ardaydu u arkaan.'
                 : 'Marka macalimiinta dhammaystiraan maadooyinka, fasalka horjoogaha ayaa publish gareeya'}
             </span>
           )}
-          {activePartPublished && !unlocked ? (
-            <Button variant="secondary" onClick={() => setUnlocked(true)} disabled={!canPublish} className="w-full sm:w-auto">
+          {activePartPublished ? (
+            <Button variant="secondary" onClick={handleEditPublished} disabled={!canPublish} className="w-full sm:w-auto">
               {hasParts && selectedPart === '1' ? 'Edit Part 1' : 'Edit'}
             </Button>
           ) : (
             <Button onClick={handlePublish} disabled={rows.length === 0 || !canPublish} className="w-full sm:w-auto">
-              {activePartPublished ? `Republish${hasParts ? ` Part ${selectedPart}` : ''}` : `Publish${hasParts ? ` Part ${selectedPart}` : ''}`}
+              {needsRepublish ? `Republish${hasParts ? ` Part ${selectedPart}` : ''}` : `Publish${hasParts ? ` Part ${selectedPart}` : ''}`}
             </Button>
           )}
         </div>
