@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import Sidebar from '@/components/Sidebar'
 import Header from '@/components/Header'
+import TeachersDayGreeting from '@/components/TeachersDayGreeting'
 
 function DashboardLayout() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
@@ -15,6 +16,7 @@ function DashboardLayout() {
           <Outlet />
         </main>
       </div>
+      <TeachersDayGreeting />
     </div>
   )
 }
