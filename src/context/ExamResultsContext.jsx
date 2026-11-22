@@ -88,33 +88,48 @@ export function ExamResultsProvider({ children }) {
     [showToast]
   )
 
-  // Isbeddel ku dhaqma (optimistic) — haddii backend-ku diido (tusaale
-  // macalinku maadadan uma qorayo, ama natiijadu horeyba waa published),
-  // dib ayaa loo soo qaadayaa xaqiiqada oo khaladka waa la muujiyaa.
-  async function setMark(enrollmentId, subjectId, mark) {
-    if (!current) return
-    setResults((prev) =>
-      prev
-        ? {
-            ...prev,
-            rows: prev.rows.map((r) =>
-              r.enrollmentId === enrollmentId
-                ? {
-                    ...r,
-                    marks: mark === null
-                      ? Object.fromEntries(Object.entries(r.marks).filter(([id]) => id !== String(subjectId)))
-                      : { ...r.marks, [subjectId]: mark },
-                  }
-                : r
-            ),
-          }
-        : prev
-    )
+  // Dhibcaha imtixaanka waa xog rasmi ah: request keliya ayaa loo diraa
+  // marka cell-ku dhamaado (page-ku sidaas ayuu u wacaa), waxaana backend-ka
+  // loo diraa version-kii uu macalinku arkay. Sidaas request duug ahi uma
+  // dabooli karo dhibcaha cusub marka shabakadu kala hormarto.
+  async function setMark(enrollmentId, subjectId, mark, expectedVersion) {
+    if (!current) return false
     try {
-      await api.put(`/exams/${current.examId}/results`, { enrollmentId, subjectId, mark, part: current.part })
+      const saved = await api.put(`/exams/${current.examId}/results`, {
+        enrollmentId,
+        subjectId,
+        mark,
+        part: current.part,
+        expectedVersion,
+      })
+      setResults((prev) =>
+        prev
+          ? {
+              ...prev,
+              rows: prev.rows.map((r) =>
+                r.enrollmentId === enrollmentId
+                  ? {
+                      ...r,
+                      marks: mark === null
+                        ? Object.fromEntries(Object.entries(r.marks).filter(([id]) => id !== String(subjectId)))
+                        : { ...r.marks, [subjectId]: mark },
+                      markVersions: { ...r.markVersions, [subjectId]: saved.markVersion },
+                    }
+                  : r
+              ),
+            }
+          : prev
+      )
+      return true
     } catch (err) {
       showToast(err.message, 'error')
-      loadResults(current.examId, current.classId, current.sectionId, current.part)
+      // 409 = qof ama request kale ayaa wax ka beddelay cell-kan. Dib ayaan
+      // uga soo qaadnaa qiimaha database-ka halkii aan ku sii hayn lahayn
+      // draft aan la kaydin.
+      if (err.status === 409) {
+        await loadResults(current.examId, current.classId, current.sectionId, current.part)
+      }
+      return false
     }
   }
 

@@ -38,6 +38,58 @@ function resultSummary(row, combined, maxMark) {
   return { average, grade: gradeFromPercentage((average / Number(maxMark)) * 100) }
 }
 
+// Qoristu ma dirto request digit kasta. Tusaale, 29 marka la qorayo wuxuu
+// browser-ka ku ahaanayaa draft ilaa macalinku ka baxo cell-ka ama Enter
+// riixo; markaas hal mar oo keliya ayaa si ammaan ah loo kaydiyaa.
+function ResultMarkInput({ value, maxMark, disabled, onCommit }) {
+  const [draft, setDraft] = useState(value ?? '')
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    if (!saving) setDraft(value ?? '')
+  }, [value, saving])
+
+  async function commit() {
+    if (disabled || saving) return
+    const text = String(draft).trim()
+    let mark = null
+    if (text !== '') {
+      const numeric = Number(text)
+      if (!Number.isFinite(numeric)) {
+        setDraft(value ?? '')
+        return
+      }
+      mark = Math.max(0, Math.min(numeric, maxMark))
+    }
+    if (String(value ?? '') === String(mark ?? '')) {
+      setDraft(mark ?? '')
+      return
+    }
+    setSaving(true)
+    const saved = await onCommit(mark)
+    if (!saved) setDraft(value ?? '')
+    setSaving(false)
+  }
+
+  return (
+    <input
+      type="number"
+      min="0"
+      max={maxMark}
+      disabled={disabled || saving}
+      value={draft}
+      onChange={(e) => setDraft(e.target.value)}
+      onBlur={() => void commit()}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') e.currentTarget.blur()
+      }}
+      aria-label="Dhibcaha ardayga"
+      title={saving ? 'Waa la kaydinayaa...' : 'Riix Enter ama ka bax cell-ka si loo kaydiyo'}
+      className="w-12 rounded-md border border-border px-1 py-1 text-xs outline-none focus:border-primary-500 disabled:opacity-50 md:w-16 md:px-2 md:text-sm"
+    />
+  )
+}
+
 const gradeBands = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'D', 'D-', 'F']
 
 function ClassPerformanceSummary({ classRows, subjects, combined, maxMark }) {
@@ -439,25 +491,18 @@ function ExamResultsPage() {
                             {row.combinedMarks?.[subj.id] ?? 0}
                           </span>
                         ) : (
-                          <input
-                            type="number"
-                            min="0"
-                            max={maxMark}
+                          <ResultMarkInput
+                            key={`${examId}-${selectedPart}-${row.enrollmentId}-${subj.id}`}
+                            value={row.marks[subj.id] ?? ''}
+                            maxMark={maxMark}
                             disabled={
                               !canEditSubject(selectedClassObj.id, selectedSectionId, subj.id) ||
                               !isCurrentYear ||
                               (row.published && (!hasParts || (selectedPart === '1' ? row.publishedPart >= 1 : row.publishedPart >= 2)))
                             }
-                            value={row.marks[subj.id] ?? ''}
-                            onChange={(e) => {
-                              if (e.target.value === '') {
-                                setMark(row.enrollmentId, subj.id, null)
-                                return
-                              }
-                              const clamped = Math.max(0, Math.min(Number(e.target.value), maxMark))
-                              setMark(row.enrollmentId, subj.id, clamped)
-                            }}
-                            className="w-12 rounded-md border border-border px-1 py-1 text-xs outline-none focus:border-primary-500 disabled:opacity-50 md:w-16 md:px-2 md:text-sm"
+                            onCommit={(mark) =>
+                              setMark(row.enrollmentId, subj.id, mark, row.markVersions?.[subj.id] ?? 0)
+                            }
                           />
                         )}
                       </td>
